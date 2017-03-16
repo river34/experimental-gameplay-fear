@@ -133,11 +133,11 @@ public class QuestManager : MonoBehaviour {
 		"SpiritTree", 1, false, quests.Count-1, -1);
 		quests.Add (quest);
 
-		foreach (Quest quest in quests)
-		{
-			// Debug.Log (quest.id + " : " + quest.next);
-			Debug.Log (quest.id + " : " + quest.text);
-		}
+		// foreach (Quest quest in quests)
+		// {
+		// 	// Debug.Log (quest.id + " : " + quest.next);
+		// 	Debug.Log (quest.id + " : " + quest.text);
+		// }
 
 		enabled = false;
 	}
@@ -172,7 +172,7 @@ public class QuestManager : MonoBehaviour {
 
 		quests[id].isFinished = true;
 		quests[id].finishTime = Time.deltaTime;
-		Debug.Log (id + " : " + quests[id].finishTime);
+		// Debug.Log (id + " : " + quests[id].finishTime);
 
 		GameController.instance.level += 1;
 
@@ -184,7 +184,7 @@ public class QuestManager : MonoBehaviour {
 				quest.isOpen = true;
 				questName.text = quest.name;
 				questText.text = quest.text;
-				Debug.Log (quest.id + " : start");
+				// Debug.Log (quest.id + " : start");
 				StartQuest (quest.id);
 			}
 		}
@@ -239,21 +239,21 @@ public class QuestManager : MonoBehaviour {
 			return false;
 		}
 
-		Debug.Log (id + " : " + quests[id].objects.Count + ", " + quests[id].num + ", (" + quests[id].fear + ")");
+		// Debug.Log (id + " : " + quests[id].objects.Count + ", " + quests[id].num + ", (" + quests[id].fear + ")");
 		if (quests[id].objects.Count >= quests[id].num)
 		{
 			if (quests[id].fear != -1)
 			{
 				if (player.fear <= quests[id].fear)
 				{
-					Debug.Log (id + " : complete");
+					// Debug.Log (id + " : complete");
 					CompleteQuest (id);
 					return true;
 				}
 			}
 			else
 			{
-				Debug.Log (id + " : complete");
+				// Debug.Log (id + " : complete");
 				CompleteQuest (id);
 				return true;
 			}

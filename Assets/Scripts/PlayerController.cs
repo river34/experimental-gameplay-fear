@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviour {
 		render = sprite.GetComponent <SpriteRenderer>();
 		halfClear = Color.yellow;
 		halfClear.a = 0.2f;
+		questManager = GameController.instance.questManager;
 	}
 
 	void Start ()
@@ -75,7 +76,6 @@ public class PlayerController : MonoBehaviour {
 		fear = GameController.instance.playerFear;
 		last_position = transform.position;
 		render.color = Color.Lerp (halfClear, Color.yellow, strength * reverseMul);
-		questManager = GameController.instance.questManager;
 	}
 
 	// Update is called once per frame
@@ -177,6 +177,16 @@ public class PlayerController : MonoBehaviour {
 
 	void UpdateInput ()
 	{
+		speed = walk_speed;
+		is_running = false;
+
+		// keyboard input
+		if (Input.GetKey("left shift") || Input.GetKey("right shift") || Input.GetKey("space"))
+		{
+			speed = run_speed;
+			is_running = true;
+		}
+
 		if (Input.GetKey("w"))
 		{
 			transform.position += Vector3.forward * speed * Time.deltaTime;
@@ -205,17 +215,6 @@ public class PlayerController : MonoBehaviour {
 		}
 		*/
 
-		if (Input.GetKey("left shift") || Input.GetKey("right shift") || Input.GetKey("space"))
-		{
-			speed = run_speed;
-			is_running = true;
-		}
-		else
-		{
-			speed = walk_speed;
-			is_running = false;
-		}
-
 		if (up_speed > 0)
 		{
 			up_speed -= gravity * Time.deltaTime;
@@ -236,6 +235,25 @@ public class PlayerController : MonoBehaviour {
 		{
 			down_speed = 0;
 			transform.position = new Vector3 (transform.position.x, 0, transform.position.z);
+		}
+
+		// mouse input
+		if (Input.GetMouseButton (1))
+		{
+			speed = run_speed;
+			is_running = true;
+		}
+
+		if (Input.GetMouseButton (0))
+		{
+			Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
+            RaycastHit floorHit;
+            if (Physics.Raycast (camRay, out floorHit, 100))
+            {
+                Vector3 position = floorHit.point - transform.position;
+                position.y = 0f;
+				transform.position += position.normalized * speed * Time.deltaTime;
+            }
 		}
 	}
 
@@ -419,7 +437,7 @@ public class PlayerController : MonoBehaviour {
 			//
 		}
 
-		if (questManager.quests.Count > 0)
+		if (questManager != null && questManager.quests.Count > 0)
 		{
 			foreach (Quest quest in questManager.quests)
 			{

@@ -19,9 +19,14 @@ public class GameController : MonoBehaviour {
 	public static GameController instance = null;
 	public CameraController camera;
 	public GameObject player;
+
+	[HideInInspector]
 	public float playerStrength;
+	[HideInInspector]
 	public float playerFear;
+	[HideInInspector]
 	public int playerComplete;
+	[HideInInspector]
 	public int level;
 
 	// UI
@@ -51,12 +56,19 @@ public class GameController : MonoBehaviour {
 	private float gameStartDelay = 0.5f;
 
 	// quest
+	[HideInInspector]
 	public QuestManager questManager;
 
 	// intro
+	[HideInInspector]
 	public IntroManager introManeger;
 
+	// sound
+	[HideInInspector]
+	public SoundManager soundManager;
+
 	// state
+	[HideInInspector]
 	public int state;
 
 	// color
@@ -78,6 +90,7 @@ public class GameController : MonoBehaviour {
 		mapGenerator = GetComponent <MapGenerator>();
 		questManager = GetComponent <QuestManager>();
 		introManeger = GetComponent <IntroManager>();
+		soundManager = GetComponent <SoundManager>();
 
 		UI_StrengthBar = UI_Strength.transform.Find ("Bar").gameObject.GetComponent<RectTransform>();
 		UI_CourageBar = UI_Courage.transform.Find ("Bar").gameObject.GetComponent<RectTransform>();
@@ -111,6 +124,7 @@ public class GameController : MonoBehaviour {
 			if (Input.GetKey ("p"))
 			{
 				EndIntro ();
+				soundManager.PlayBackground ();
 				state = States.START;
 			}
 		}
@@ -174,6 +188,7 @@ public class GameController : MonoBehaviour {
 	public void GameComplete ()
 	{
 		UI_Game.SetActive (false);
+		soundManager.StopBackground ();
 		state = States.COMPLETE;
 		StartComplete ();
 	}
@@ -248,6 +263,7 @@ public class GameController : MonoBehaviour {
 
 	void EndIntro ()
 	{
+		UI_Title.SetActive (false);
 		introManeger.End ();
 	}
 

@@ -1,0 +1,10 @@
+To Do
+- possible tablet support
+- playtest
+- audio track
+
+Done
+- main mechanism (first iteration)
+- quest system
+- add mouse support
+- add simple sound effect

@@ -14,10 +14,20 @@
   - Artist: River Liu
 
 
-#### References
+### References
 
   - Don't Starve - Klei Entertainment (2013)
   - Year Walk - Simogo (2013)
   - Dead Secret - Robot Invader (2015)
   - Neverending Nightmares - Infinitap Games（2014）
   - Anatomy - Kitty Horrorshow (2016)
+
+
+### Fonts
+
+  - Vintage Avalanche
+  - Bakery
+
+
+### Sound effect
+  - [Wind Sound](http://soundbible.com/1810-Wind.html)

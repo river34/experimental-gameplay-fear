@@ -6,6 +6,13 @@ public class MapController : MonoBehaviour {
 
 	private MapGenerator map;
 	private Transform player;
+	private BoxCollider collider;
+
+	void Start ()
+	{
+		collider = gameObject.AddComponent <BoxCollider> ();
+		collider.isTrigger = true;
+	}
 
 	void Update ()
 	{
@@ -17,6 +24,7 @@ public class MapController : MonoBehaviour {
 		if (map == null)
 		{
 			map = GameObject.FindGameObjectWithTag ("GameController").GetComponent <MapGenerator> ();;
+			collider.size = new Vector3 (map.map_width, 1, map.map_height);
 		}
 
 		Vector3 distance = player.position - transform.position;
