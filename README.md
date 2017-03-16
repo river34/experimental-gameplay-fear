@@ -4,8 +4,8 @@
 
 ### How to play
 
-  - WASD to move
-  - Space to speed up
+  - WASD or Left Click to move
+  - Space or Right Click to speed up
 
 
 ### Credits
@@ -19,8 +19,10 @@
   - Don't Starve - Klei Entertainment (2013)
   - Year Walk - Simogo (2013)
   - Dead Secret - Robot Invader (2015)
-  - Neverending Nightmares - Infinitap Games（2014）
+  - Neverending Nightmares - Infinitap Games (2014)
   - Anatomy - Kitty Horrorshow (2016)
+  - Skyrim - Bethesda Game Studios (2011)
+  - Chris’ Survival Horror Quest - Chris Pruett
 
 
 ### Fonts

@@ -109,7 +109,7 @@ public class QuestManager : MonoBehaviour {
 		quests.Add (quest);
 
 		// quest 3 : ghosts
-		quest = new Quest (quests.Count, "Ghosts", "Wisdom Tree also says, in the fear forest there live Ghosts.\r\nIf Ima gets too close, they will take away Ima's physical strength.  Shift to run away from Ghosts.",
+		quest = new Quest (quests.Count, "Ghosts", "Wisdom Tree also says, in the fear forest there live Ghosts.  If Ima gets too close, \r\nthey will take away Ima's physical strength.  Space / Right Click to run away from Ghosts.",
 		"Monster", 5, false, quests.Count-1, quests.Count+1);
 		quests.Add (quest);
 
