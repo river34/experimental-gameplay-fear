@@ -12,6 +12,12 @@
 
   - Engineer: River Liu
   - Artist: River Liu
+  - Playtesters: Xuesong Liang, Emre Findik, Sunil Nayak
+
+
+### Special thanks
+
+  - Emre for coming up with the names of Ima and Kumu
 
 
 ### References

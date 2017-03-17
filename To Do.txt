@@ -1,10 +1,37 @@
-To Do
+# To Do
 - possible tablet support
-- playtest
+- balance
+- more playtest
 - audio track
 
-Done
-- main mechanism (first iteration)
-- quest system
-- add mouse support
-- add simple sound effect
+# Done
+- created main mechanism (first iteration)
+- added a quest system
+- added mouse support
+- added simple sound effects
+- playtest with Xuesong, Emre, Sunil
+- upgraded the quest system (after first playtest), fixed a few problems
+- added more instructions to explain visual clues and extend the story
+- modified the balance of strength-ghost-courage, made it more exciting (difficult)
+
+# Playtest
+- 3.15 Xuesong
+    - got stuck at a quest. how to get rid of the ghosts??
+- 3.15 Emre:
+    - I started walking downwards instead of upwards in the beginning so I never found the wisdom tree (I got it on my second try walking in the other direction).
+    - I also see you didn't have time to make walking animations in all eight directions.
+    - Unless a ghost comes and catches me I can't advance and it is easy to run away from ghosts anyway.
+    - you might want to try limiting the running away. maybe it drains your physical energy much faster?
+    - I like this game. damn I wish it had sound.
+    - kumu apparently means teacher in hawaiian.
+    - the spirit tree was super hard to find, which I understand.
+    - but I found it in the first game without even reaching the "is this the true nature of courage? go ask the spirit tree" part.
+- 3.15 Sunil:
+    - complex and interesting story.
+    - need more direction animation.
+    - did not notice the hints at the bottom in the beginning.
+    - after a while, it seems that nothing can happen. is this an endless game?
+    - is ima lost in the forest and trying to escape? do not know she is there.
+    - no idea of loosing health.
+    - ghosts are too close to camera.
+    - need music.

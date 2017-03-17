@@ -29,7 +29,7 @@ public class MapController : MonoBehaviour {
 
 		Vector3 distance = player.position - transform.position;
 
-		if (distance.sqrMagnitude > 6400)
+		if (distance.sqrMagnitude > 3200)
 		{
 			map.RemoveMap (transform.position.x, transform.position.z);
 			Destroy (gameObject);

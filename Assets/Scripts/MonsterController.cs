@@ -16,10 +16,13 @@ public class MonsterController : MonoBehaviour {
 	private float rad;
 	private SpriteRenderer render;
 	private float reverseMul = 0.001f;
-	private float maxScale = 3f;
+	private float maxScale = 2f;
 	private float scaleSpeed = 0.3f;
 	private float radSpeed = 0.1f;
 	private float maxRad = 1f;
+	private Color highClear = Color.clear * 0.75f;
+	private Color halfClear = Color.clear * 0.5f;
+	private Color lowClear = Color.clear * 0.25f;
 
 	void Awake ()
 	{
@@ -59,14 +62,22 @@ public class MonsterController : MonoBehaviour {
 
 			if (FindPlayer)
 			{
-				if (GameController.instance.playerFear > player.mid_fear)
+				if (GameController.instance.playerFear > player.high_fear)
 				{
 					if (transform.localScale.x < maxScale)
 					{
 						transform.localScale += Vector3.one * GameController.instance.playerFear * reverseMul * Time.deltaTime * scaleSpeed;
 					}
 				}
-				else if (GameController.instance.playerFear <= player.mid_fear)
+				else if (GameController.instance.playerFear > player.mid_fear)
+				{
+					render.color = Color.Lerp (render.color, halfClear, (1f - GameController.instance.playerFear * reverseMul) * Time.deltaTime);
+				}
+				else if (GameController.instance.playerFear > player.low_fear)
+				{
+					render.color = Color.Lerp (render.color, lowClear, (1f - GameController.instance.playerFear * reverseMul) * Time.deltaTime);
+				}
+				else if (GameController.instance.playerFear >= player.min_fear)
 				{
 					render.color = Color.Lerp (render.color, Color.clear, (1f - GameController.instance.playerFear * reverseMul) * Time.deltaTime);
 				}

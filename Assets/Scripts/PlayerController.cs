@@ -15,18 +15,19 @@ public class PlayerController : MonoBehaviour {
 	public float strength;
 	private int min_strength = 0;
 	private int max_strength = 1000;
-	private int strengthGain = 300;
-	private int strengthLoss = 10;
+	private int strengthGain = 350;
+	private int strengthLoss = 5;
 
 	// fear
 	public float fear;
-	private int min_fear = 0;
-	public int mid_fear = 500;
+	public int min_fear = 0;
+	public int low_fear = 300;
+	public int mid_fear = 600;
+	public int high_fear = 800;
 	private int max_fear = 1000;
-	private int fearGain = 50;
-	private int fearLoss = 10;
-	private int courageGain = 300;
-	private int courageLoss = 1;
+	private int fearGain = 20;
+	private int fearLoss = 5;
+	private int courageGain = 100;
 
 	// position
 	private Vector3 last_position;
@@ -141,7 +142,7 @@ public class PlayerController : MonoBehaviour {
 	// reach border of the current map
 	void ReachBoarder ()	// up - 0, right - 1, bottom - 2, left - 3, none - -1
 	{
-		if (transform.position.z >= map.up - 20f)
+		if (transform.position.z >= map.up - 15f)
 		{
 			map_up = true;
 		}
@@ -149,7 +150,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_up = false;
 		}
-		if (transform.position.x >= map.right - 30f)
+		if (transform.position.x >= map.right - 15f)
 		{
 			map_right = true;
 		}
@@ -157,7 +158,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_right = false;
 		}
-		if (transform.position.z <= map.bottom + 20f)
+		if (transform.position.z <= map.bottom + 5f)
 		{
 			map_bottom = true;
 		}
@@ -165,7 +166,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_bottom = false;
 		}
-		if (transform.position.x <= map.left + 30f)
+		if (transform.position.x <= map.left + 15f)
 		{
 			map_left = true;
 		}
@@ -179,6 +180,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		speed = walk_speed;
 		is_running = false;
+		Vector3 movement = Vector3.zero;
 
 		// keyboard input
 		if (Input.GetKey("left shift") || Input.GetKey("right shift") || Input.GetKey("space"))
@@ -187,25 +189,26 @@ public class PlayerController : MonoBehaviour {
 			is_running = true;
 		}
 
-		if (Input.GetKey("w"))
+		if (Input.GetKey("w") || Input.GetKey("up"))
 		{
-			transform.position += Vector3.forward * speed * Time.deltaTime;
+			movement = Vector3.forward;
 		}
-		else if (Input.GetKey("s"))
+		else if (Input.GetKey("s") || Input.GetKey("down"))
 		{
-			transform.position += Vector3.back * speed * Time.deltaTime;
+			movement = Vector3.back;
 		}
 
-		if (Input.GetKey("a"))
+		if (Input.GetKey("a") || Input.GetKey("left"))
 		{
-			transform.position += Vector3.left * speed * Time.deltaTime;
+			movement = Vector3.left;
 		}
-		else if (Input.GetKey("d"))
+		else if (Input.GetKey("d") || Input.GetKey("right"))
 		{
-			transform.position += Vector3.right * speed * Time.deltaTime;
+			movement = Vector3.right;
 		}
 
 		/*
+		// jump
 		if (Input.GetKey("space"))
 		{
 			if (transform.position.y <= 0)
@@ -213,7 +216,6 @@ public class PlayerController : MonoBehaviour {
 				up_speed = jump_speed;
 			}
 		}
-		*/
 
 		if (up_speed > 0)
 		{
@@ -236,6 +238,7 @@ public class PlayerController : MonoBehaviour {
 			down_speed = 0;
 			transform.position = new Vector3 (transform.position.x, 0, transform.position.z);
 		}
+		*/
 
 		// mouse input
 		if (Input.GetMouseButton (1))
@@ -252,9 +255,11 @@ public class PlayerController : MonoBehaviour {
             {
                 Vector3 position = floorHit.point - transform.position;
                 position.y = 0f;
-				transform.position += position.normalized * speed * Time.deltaTime;
+				movement = position.normalized;
             }
 		}
+
+		transform.position += movement * speed * Time.deltaTime;
 	}
 
 	void UpdateMap ()
@@ -316,13 +321,17 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (is_moving)
 		{
-			if (monsters.Count > 0 && fear > mid_fear)
+			if (monsters.Count > 0 && fear > high_fear)
 			{
-				LossStrength (strengthLoss * Time.deltaTime * 3);
+				LossStrength (strengthLoss * (monsters.Count + 3) * Time.deltaTime);
 			}
-			else if (monsters.Count > 0 && fear > min_fear)
+			else if (monsters.Count > 0 && fear > mid_fear)
 			{
-				LossStrength (strengthLoss * Time.deltaTime * 2);
+				LossStrength (strengthLoss * (monsters.Count + 2) * Time.deltaTime);
+			}
+			else if (monsters.Count > 0 && fear > low_fear)
+			{
+				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
 			}
 			else
 			{
@@ -330,15 +339,19 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
-		if (is_running)
+
+		if (is_running && is_moving)
 		{
-			GainFear (fearGain * Time.deltaTime);
+			if (monsters.Count > 0)
+			{
+				GainFear (fearGain * monsters.Count * Time.deltaTime);
+			}
 		}
 		else
 		{
 			if (monsters.Count > 0)
 			{
-				LossFear (fearLoss * Time.deltaTime);
+				LossFear (fearLoss * monsters.Count * Time.deltaTime);
 			}
 		}
 	}

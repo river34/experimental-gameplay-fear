@@ -44,12 +44,14 @@ public class MapGenerator : MonoBehaviour {
 	private Transform mapHolder;
 	private Transform subMapHolder;
 	private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
+	private List <Vector3> centers = new List <Vector3> ();
 
 	private bool noMonster;
 	private bool noStrength;
 	private bool noCourage;
 	private bool noWisdomTree;
 	private bool noSpiritTree;
+
 
 	public void RemoveMap (float offset_x, float offset_y)
 	{
@@ -120,19 +122,11 @@ public class MapGenerator : MonoBehaviour {
 			}
 		}
 
-		if (!noStrength)
-		{
-			LayoutObjectAtRandom (strengthTiles, 10, 20, offset_x, offset_y);
-		}
-
-		if (!noCourage)
-		{
-			LayoutObjectAtRandom (courageTiles, 5, 10, offset_x, offset_y);
-		}
+		centers.Clear ();
 
 		if (!noWisdomTree)
 		{
-			LayoutObjectAtRandom (wisdomTreeTiles, 0, 2, offset_x, offset_y);
+			LayoutObjectAtRandom (wisdomTreeTiles, 1, 3, offset_x, offset_y);
 		}
 
 		if (!noSpiritTree)
@@ -140,10 +134,23 @@ public class MapGenerator : MonoBehaviour {
 			LayoutObjectAtRandom (spiritTreeTiles, 0, 1, offset_x, offset_y);
 		}
 
+		if (!noStrength)
+		{
+			// LayoutObjectAtRandom (strengthTiles, 10, 20, offset_x, offset_y);
+			int strengthCount = Mathf.Max (20, 35 - GameController.instance.level);
+			weirdaLayoutObjectAroundLocationsAtRandom (strengthTiles, strengthCount - 10, strengthCount, offset_x, offset_y, centers);
+		}
+
+		if (!noCourage)
+		{
+			// LayoutObjectAtRandom (courageTiles, 5, 10, offset_x, offset_y);
+			weirdaLayoutObjectAroundLocationsAtRandom (courageTiles, 4, 4, offset_x, offset_y, centers);
+		}
+
 		if (!noMonster)
 		{
 			// int monsterCount = (int) Mathf.Log (GameController.instance.level, 2f);
-			int monsterCount = GameController.instance.level * 3;
+			int monsterCount = GameController.instance.level * 2;
 			LayoutObjectAtRandom (monsterTiles, monsterCount, monsterCount, offset_x, offset_y);
 		}
 
@@ -238,11 +245,42 @@ public class MapGenerator : MonoBehaviour {
 	{
 		int objectCount = Random.Range (minimum, maximum+1);
 
-		for(int i = 0; i < objectCount; i++)
+		for (int i = 0; i < objectCount; i++)
 		{
 			Vector3 randomPosition = RandomPosition ();
+			randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
+			randomPosition.y = 0f;
+			randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+
 			GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
-			GameObject tile = Instantiate (tileChoice, new Vector3 (-map_width/2 + randomPosition.x * size + offset_x, 0f, -map_height/2 + randomPosition.z * size + offset_y), Quaternion.identity);
+			GameObject tile = Instantiate (tileChoice, randomPosition, Quaternion.identity);
+			tile.transform.SetParent (subMapHolder);
+
+			centers.Add (randomPosition);
+		}
+	}
+
+	void weirdaLayoutObjectAroundLocationsAtRandom (GameObject[] tileArray, int minimum, int maximum, float offset_x, float offset_y, List<Vector3> centers)
+	{
+		int objectCount = Random.Range (minimum, maximum+1);
+
+		for (int i = 0; i < objectCount; i++)
+		{
+			Vector3 randomPosition;
+			if (centers.Count > 0)
+			{
+				randomPosition = RandomPositionAroundCenters (centers);
+			}
+			else
+			{
+				randomPosition = RandomPosition ();
+			}
+			randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
+			randomPosition.y = 0f;
+			randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+
+			GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
+			GameObject tile = Instantiate (tileChoice, randomPosition, Quaternion.identity);
 			tile.transform.SetParent (subMapHolder);
 		}
 	}
@@ -250,6 +288,29 @@ public class MapGenerator : MonoBehaviour {
 	Vector3 RandomPosition ()
 	{
 		int randomIndex = Random.Range (0, gridPositions.Count);
+		Vector3 randomPosition = gridPositions[randomIndex];
+		gridPositions.RemoveAt (randomIndex);
+		return randomPosition;
+	}
+
+	Vector3 RandomPositionAroundCenters (List<Vector3> centers) // distance <3
+	{
+		int randomIndex = Random.Range (0, centers.Count);
+		int randomDistanceX = Random.Range (-2, 2);
+		int randomDistanceZ = Random.Range (-2, 2);
+		if (randomDistanceX == 0 && randomDistanceZ == 0)
+		{
+			randomDistanceZ = Random.Range (2, 0);
+		}
+		randomIndex += randomDistanceX + randomDistanceZ * width;
+		while (randomIndex > gridPositions.Count - 1)
+		{
+			randomIndex -= 1;
+		}
+		while (randomIndex < 0)
+		{
+			randomIndex += 1;
+		}
 		Vector3 randomPosition = gridPositions[randomIndex];
 		gridPositions.RemoveAt (randomIndex);
 		return randomPosition;

@@ -68,11 +68,14 @@ public class GameController : MonoBehaviour {
 	public SoundManager soundManager;
 
 	// state
-	[HideInInspector]
+	// [HideInInspector]
 	public int state;
 
 	// color
 	private Color halfBlack = new Color (0, 0, 0, 0.7f);
+
+	// time control
+	private float time;
 
 	void Awake ()
 	{
@@ -96,6 +99,7 @@ public class GameController : MonoBehaviour {
 		UI_CourageBar = UI_Courage.transform.Find ("Bar").gameObject.GetComponent<RectTransform>();
 		UI_CompleteBar = UI_Complete.transform.Find ("Bar").gameObject.GetComponent<RectTransform>();
 
+		time = Time.time;
 		state = States.TITLE;
 	}
 
@@ -108,9 +112,10 @@ public class GameController : MonoBehaviour {
 				UI_Title.SetActive (true);
 			}
 
-			if (Input.anyKey)
+			if (Time.time - time > 0.5f && Input.anyKey)
 			{
 				StartIntro ();
+				time = Time.time;
 				state = States.INTRO;
 			}
 		}
@@ -121,16 +126,18 @@ public class GameController : MonoBehaviour {
 				UI_Title.GetComponent <Image> ().color -= new Color (0, 0, 0, Time.deltaTime);
 			}
 
-			if (Input.GetKey ("p"))
+			if (Time.time - time > 0.5f && Input.GetKey ("p"))
 			{
 				EndIntro ();
 				soundManager.PlayBackground ();
+				time = Time.time;
 				state = States.START;
 			}
 		}
 		else if (state == States.START)
 		{
 			InitGame ();
+			time = Time.time;
 			state = States.QUEST;
 		}
 		else if (state == States.QUEST)
@@ -144,26 +151,22 @@ public class GameController : MonoBehaviour {
 		{
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = "You are ready";
 
-			// state = States.END;
-			if (Input.GetKey ("p"))
+			if (Time.time - time > 0.5f && Input.GetKey ("p"))
 			{
 				EndIntro ();
+				time = Time.time;
 				state = States.START;
 			}
 		}
 		else if (state == States.FAIL)
 		{
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = "You are not ready";
+			time = Time.time;
 			state = States.END;
 		}
 		else if (state == States.END)
 		{
 			GameEnd ();
-
-			if (Input.GetKey ("space"))
-			{
-				InitGame ();
-			}
 		}
 	}
 
@@ -171,24 +174,36 @@ public class GameController : MonoBehaviour {
 	{
 		if (state == States.INTRO)
 		{
+			time = Time.time;
 			state = States.START;
 		}
 		else if (state == States.COMPLETE)
 		{
+			time = Time.time;
 			state = States.END;
 		}
 	}
 
 	public void GameOver ()
 	{
+		Destroy (playerObject);
+		Destroy (mapObject);
+		playerObject = null;
+		mapObject = null;
 		UI_Game.SetActive (false);
+		time = Time.time;
 		state = States.FAIL;
 	}
 
 	public void GameComplete ()
 	{
+		Destroy (playerObject);
+		Destroy (mapObject);
+		playerObject = null;
+		mapObject = null;
 		UI_Game.SetActive (false);
 		soundManager.StopBackground ();
+		time = Time.time;
 		state = States.COMPLETE;
 		StartComplete ();
 	}
@@ -197,11 +212,12 @@ public class GameController : MonoBehaviour {
 	{
 		UI_Block.SetActive (false);
 		UI_End.SetActive (true);
-		Destroy (playerObject);
-		Destroy (mapObject);
-		playerObject = null;
-		mapObject = null;
 		camera.enabled = false;
+
+		if (Input.GetKey ("space"))
+		{
+			Invoke ("InitGame", gameStartDelay);
+		}
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -219,6 +235,7 @@ public class GameController : MonoBehaviour {
 	{
 		if (state == States.END)
 		{
+			time = Time.time;
 			state = States.QUEST;
 		}
 
