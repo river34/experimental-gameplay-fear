@@ -101,6 +101,9 @@ public class GameController : MonoBehaviour {
 
 		time = Time.time;
 		state = States.TITLE;
+
+		// test
+		state = States.COMPLETE;
 	}
 
 	void Update ()
@@ -149,18 +152,27 @@ public class GameController : MonoBehaviour {
 		}
 		else if (state == States.COMPLETE)
 		{
-			UI_End.transform.Find ("Text").GetComponent<Text>().text = "You are ready";
+			string[] completes = new string[4];
+			completes[0] = "Great courage rises from fear";
+			completes[1] = "Courage is always in your heart";
+			completes[2] = "Fear can take you to find courage";
+			completes[3] = "May courgae always be with you";
+			UI_End.transform.Find ("Text").GetComponent<Text>().text = completes [Random.Range (0, completes.Length)];
 
 			if (Time.time - time > 0.5f && Input.GetKey ("p"))
 			{
 				EndIntro ();
 				time = Time.time;
-				state = States.START;
+				state = States.END;
 			}
 		}
 		else if (state == States.FAIL)
 		{
-			UI_End.transform.Find ("Text").GetComponent<Text>().text = "You are not ready";
+			string[] fails = new string[3];
+			fails[0] = "Without fear, there is no courage";
+			fails[1] = "Fear is temporary";
+			fails[2] = "A Kumu will never give up";
+			UI_End.transform.Find ("Text").GetComponent<Text>().text = fails [Random.Range (0, fails.Length)];
 			time = Time.time;
 			state = States.END;
 		}
@@ -214,7 +226,7 @@ public class GameController : MonoBehaviour {
 		UI_End.SetActive (true);
 		camera.enabled = false;
 
-		if (Input.GetKey ("space"))
+		if (Time.time - time > 1 && Input.GetKey ("space"))
 		{
 			Invoke ("InitGame", gameStartDelay);
 		}

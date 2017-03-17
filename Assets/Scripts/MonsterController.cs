@@ -108,11 +108,13 @@ public class MonsterController : MonoBehaviour {
 
 		if (transform.localScale.x < Mathf.Epsilon)
 		{
+			player.RemoveMonster (gameObject);
 			Destroy (gameObject);
 		}
 
 		if (render.color.a < Mathf.Epsilon)
 		{
+			player.RemoveMonster (gameObject);
 			Destroy (gameObject);
 		}
 	}

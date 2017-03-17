@@ -113,7 +113,7 @@ public class QuestManager : MonoBehaviour {
 		quests.Add (quest);
 
 		// quest 4 : courage
-		quest = new Quest (quests.Count, "Courage 2", "Courage makes Ima see things more clear. That's excatly what Ima needs now.",
+		quest = new Quest (quests.Count, "Courage 2", "Courage lets Ima see things more clear. That's excatly what Ima needs now.",
 		"Courage", 1, false, quests.Count-1, quests.Count+1, -1, 800,
 		true, false, false, false, false);
 		quests.Add (quest);
@@ -125,7 +125,7 @@ public class QuestManager : MonoBehaviour {
 		quests.Add (quest);
 
 		// quest 6 : fear
-		quest = new Quest (quests.Count, "Fear", "Fear is consuming poor Ima.  Ima's vision gets worse and worse, do does Ima's strength.",
+		quest = new Quest (quests.Count, "Fear", "Fear is consuming poor Ima.  Ima's vision gets worse and worse, so does Ima's strength.",
 		"Monster", 10, false, quests.Count-1, quests.Count+1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);

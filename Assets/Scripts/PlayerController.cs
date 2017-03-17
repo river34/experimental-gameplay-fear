@@ -15,8 +15,8 @@ public class PlayerController : MonoBehaviour {
 	public float strength;
 	private int min_strength = 0;
 	private int max_strength = 1000;
-	private int strengthGain = 350;
-	private int strengthLoss = 5;
+	private int strengthGain = 250;
+	private int strengthLoss = 10;
 
 	// fear
 	public float fear;
@@ -338,9 +338,24 @@ public class PlayerController : MonoBehaviour {
 				LossStrength (strengthLoss * Time.deltaTime);
 			}
 		}
+		else
+		{
+			if (monsters.Count > 0 && fear > high_fear)
+			{
+				LossStrength (strengthLoss * (monsters.Count + 3) * Time.deltaTime);
+			}
+			else if (monsters.Count > 0 && fear > mid_fear)
+			{
+				LossStrength (strengthLoss * (monsters.Count + 2) * Time.deltaTime);
+			}
+			else if (monsters.Count > 0 && fear > low_fear)
+			{
+				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
+			}
+		}
 
 
-		if (is_running && is_moving)
+		if (is_running)
 		{
 			if (monsters.Count > 0)
 			{
@@ -481,7 +496,12 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (other.gameObject.CompareTag ("Monster"))
 		{
-			monsters.Remove (other.gameObject);
+			RemoveMonster (other.gameObject);
 		}
+	}
+
+	public void RemoveMonster (GameObject gameObject)
+	{
+		monsters.Remove (gameObject);
 	}
 }
