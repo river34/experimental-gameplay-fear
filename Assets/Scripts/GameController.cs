@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour {
 	public GameObject UI_Strength;
 	public GameObject UI_Courage;
 	public GameObject UI_Complete;
+	public GameObject UI_Nav;
 	public Image UI_Mask;
 	private RectTransform UI_StrengthBar;
 	private RectTransform UI_CourageBar;
@@ -101,9 +102,6 @@ public class GameController : MonoBehaviour {
 
 		time = Time.time;
 		state = States.TITLE;
-
-		// test
-		state = States.COMPLETE;
 	}
 
 	void Update ()
@@ -152,12 +150,10 @@ public class GameController : MonoBehaviour {
 		}
 		else if (state == States.COMPLETE)
 		{
-			string[] completes = new string[4];
-			completes[0] = "Great courage rises from fear";
-			completes[1] = "Courage is always in your heart";
-			completes[2] = "Fear can take you to find courage";
-			completes[3] = "May courgae always be with you";
+			string[] completes = new string[1];
+			completes[0] = "May courgae always be with you";
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = completes [Random.Range (0, completes.Length)];
+			UI_End.transform.Find ("Restart").GetComponent<Text>().text = "Space to replay";
 
 			if (Time.time - time > 0.5f && Input.GetKey ("p"))
 			{
@@ -168,11 +164,11 @@ public class GameController : MonoBehaviour {
 		}
 		else if (state == States.FAIL)
 		{
-			string[] fails = new string[3];
-			fails[0] = "Without fear, there is no courage";
-			fails[1] = "Fear is temporary";
-			fails[2] = "A Kumu will never give up";
+			string[] fails = new string[2];
+			fails[0] = "Fear is temporary. You can do better";
+			fails[1] = "A Kumu will never give up and neither shall you";
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = fails [Random.Range (0, fails.Length)];
+			UI_End.transform.Find ("Restart").GetComponent<Text>().text = "Space to try again";
 			time = Time.time;
 			state = States.END;
 		}
@@ -225,6 +221,7 @@ public class GameController : MonoBehaviour {
 		UI_Block.SetActive (false);
 		UI_End.SetActive (true);
 		camera.enabled = false;
+		questManager.enabled = false;
 
 		if (Time.time - time > 1 && Input.GetKey ("space"))
 		{
@@ -278,6 +275,7 @@ public class GameController : MonoBehaviour {
 		map_width = mapGenerator.map_width;
 		map_height = mapGenerator.map_height;
 
+		questManager.enabled = true;
 		questManager.InitQuest ();
 
 		Invoke ("StartQuest", gameStartDelay);
@@ -306,7 +304,6 @@ public class GameController : MonoBehaviour {
 
 	void StartQuest ()
 	{
-		questManager.enabled = true;
 		playerObject.GetComponent <PlayerController>().enabled = true;
 		UI_Block.SetActive (false);
 		UI_Game.SetActive (true);

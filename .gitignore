@@ -6,10 +6,10 @@ Library/
 Temp/
 ProjectSettings/
 *.meta
+Assembly-CSharp.csproj
 
 ## Build
 Build/
 
 ## other
 Other
-

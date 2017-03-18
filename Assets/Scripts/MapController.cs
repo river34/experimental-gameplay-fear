@@ -7,6 +7,7 @@ public class MapController : MonoBehaviour {
 	private MapGenerator map;
 	private Transform player;
 	private BoxCollider collider;
+	private float maxDistance = 1600f;
 
 	void Start ()
 	{
@@ -19,6 +20,8 @@ public class MapController : MonoBehaviour {
 		if (player == null)
 		{
 			player = GameObject.FindGameObjectWithTag ("Player").transform;
+			float maxView = GameObject.FindGameObjectWithTag ("Player").GetComponent <PlayerController> ().maxView;
+			maxDistance = maxView * maxView * 16;
 		}
 
 		if (map == null)
@@ -29,7 +32,7 @@ public class MapController : MonoBehaviour {
 
 		Vector3 distance = player.position - transform.position;
 
-		if (distance.sqrMagnitude > 3200)
+		if (distance.sqrMagnitude > maxDistance)
 		{
 			map.RemoveMap (transform.position.x, transform.position.z);
 			Destroy (gameObject);

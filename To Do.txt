@@ -1,8 +1,9 @@
 # To Do
 - possible tablet support
-- balance
 - more playtest
-- audio track
+- audio track (Colin)
+- refine story lines
+- voice over
 
 # Done
 - created main mechanism (first iteration)
@@ -13,6 +14,11 @@
 - upgraded the quest system (after first playtest), fixed a few problems
 - added more instructions to explain visual clues and extend the story
 - modified the balance of strength-ghost-courage, made it more exciting (difficult)
+- fixed map hiccup problem - optimized
+- recalculated the balance
+- removed yellow dots, or find another use of it
+- added a navigation system
+- reconsidered the quests to give more info - multiple branches
 
 # Playtest
 - 3.15 Xuesong
@@ -35,3 +41,16 @@
     - no idea of loosing health.
     - ghosts are too close to camera.
     - need music.
+- 3.15: Colin:
+    - I feel like the walking Down stands out quite a bit because of how smooth the walking in the other 3 directions is. It looks like she is walking backwards when you go down (D)
+    - Sometimes when walking fast (spacebar) from a slow walk there’s a small hiccup
+    - Without an incentive to walk slowly, I don’t really see a point to walk not going fast. Maybe adding a mechanic like The amount of physical strength or courage determines how fast she can walk, or walking fast depletes one of those two elements will give the walking fast mechanic more purpose.
+    - Maybe having red dots circle her in the same way the yellow dots do which correlate with the amount of stars gathered.
+    - It would be nice to full screen this or darken the background of your site. A game like this would be cool to play in the dark so the white background of your site distracts a little.
+    - Maybe the stars pulse a little brighter, just for more contrast against the rest of the scene.
+    - The ability to pause the game would be a nice feature as well, but I can see how it can be an intentional choice to not include that.
+- 3.15: Xuesong
+    - dots around ima was confusing. was it the health? star collected?
+    - got stuck after collected first red star (cannot find the second red star)
+    - did not understand hot to get rid of ghosts
+    - did not know why ima died - indication of physical strength was not clear

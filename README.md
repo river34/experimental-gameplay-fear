@@ -4,20 +4,21 @@
 
 ### How to play
 
-  - WASD or Left Click to move
-  - Space or Right Click to speed up
+  - WASD / Left Click to move
+  - Shift / Space / Right Click to speed up
 
 
 ### Credits
 
   - Engineer: River Liu
   - Artist: River Liu
-  - Playtesters: Xuesong Liang, Emre Findik, Sunil Nayak
+  - Playtesters: Xuesong Liang, Emre Findik, Sunil Nayak, Colin Andrew Grant
 
 
 ### Special thanks
 
   - Emre for coming up with the names of Ima and Kumu
+  - Colin for kindly offering to bring music to the game
 
 
 ### References

@@ -23,6 +23,8 @@ public class MonsterController : MonoBehaviour {
 	private Color highClear = Color.clear * 0.75f;
 	private Color halfClear = Color.clear * 0.5f;
 	private Color lowClear = Color.clear * 0.25f;
+	private GameObject shadow;
+	private Transform mapHolder;
 
 	void Awake ()
 	{
@@ -31,6 +33,16 @@ public class MonsterController : MonoBehaviour {
 		render = transform.Find ("Sprite").GetComponent <SpriteRenderer>();
 		farDistance = 15f * 15f;
 		closeDistance = Random.Range (4f, 16f);
+
+		// shadow
+		mapHolder = GameObject.Find ("Map").transform;
+		shadow = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+		shadow.tag = "Shadow";
+		shadow.GetComponent <Renderer> ().enabled = false;
+		shadow.GetComponent <SphereCollider> ().isTrigger = true;
+		shadow.GetComponent <SphereCollider> ().radius = 6f;
+		shadow.transform.SetParent (mapHolder);
+		shadow.layer = LayerMask.NameToLayer ("Ignore Raycast");
 	}
 
 	void Update () {
@@ -100,21 +112,25 @@ public class MonsterController : MonoBehaviour {
 				transform.Find ("Sprite").localPosition = Vector3.zero;
 			}
 		}
+
+		shadow.transform.position = transform.position;
 	}
 
 	void LateUpdate ()
 	{
 		lastFindPlayer = FindPlayer;
 
-		if (transform.localScale.x < Mathf.Epsilon)
+		if (transform.localScale.x < 0.1)
 		{
-			player.RemoveMonster (gameObject);
+			player.RemoveMonster (gameObject, shadow);
+			Destroy (shadow);
 			Destroy (gameObject);
 		}
 
-		if (render.color.a < Mathf.Epsilon)
+		if (render.color.a < 0.1)
 		{
-			player.RemoveMonster (gameObject);
+			player.RemoveMonster (gameObject, shadow);
+			Destroy (shadow);
 			Destroy (gameObject);
 		}
 	}

@@ -12,10 +12,11 @@ public class Quest
 	public string tag;			// tag of objects to interact with
 	public int num;				// num of objects to interact with
 	public bool isOpen;			// is available now
-	public int prerequisite;	// index of the previous quest; -1 if any
-	public int next;			// index of the next quest; null if any
-	public float strength;
-	public float fear;
+	public string[] next;		// name of the next quest; null if any
+	public float minStrength;
+	public float maxStrength;
+	public float minFear;
+	public float maxFear;
 	public bool strengthStar;
 	public bool courageStar;
 	public bool wisdomTree;
@@ -27,7 +28,8 @@ public class Quest
 	public float finishTime;
 	public List<GameObject> objects;
 
-	public Quest (int _id, string _name, string _text, string _tag, int _num, bool _isOpen, int _prerequisite, int _next, float _strength, float _fear, bool _strengthStar, bool _courageStar, bool _wisdomTree, bool _spiritTree, bool _monster)
+	public Quest (int _id, string _name, string _text, string _tag, int _num, bool _isOpen, string[] _next,
+		float _minStrength, float _maxStrength, float _minFear, float _maxFear, bool _strengthStar, bool _courageStar, bool _wisdomTree, bool _spiritTree, bool _monster)
 	{
 		id = _id;
 		name = _name;
@@ -35,10 +37,11 @@ public class Quest
 		tag = _tag;
 		num = _num;
 		isOpen = _isOpen;
-		prerequisite = _prerequisite;
 		next = _next;
-		strength = _strength;
-		fear = _fear;
+		minStrength = _minStrength;
+		maxStrength = _maxStrength;
+		minFear = _minFear;
+		maxFear = _maxFear;
 		strengthStar = _strengthStar;
 		courageStar = _courageStar;
 		wisdomTree = _wisdomTree;
@@ -87,110 +90,253 @@ public class QuestManager : MonoBehaviour {
 	public void InitQuest ()
 	{
 		quests.Clear ();
+		string thisName;
+		string[] nextName;
 
-		// quest 0 : collect yellow star
-		quest = new Quest (quests.Count, "Strength 1", "Ima needs physical strength to explore the forest.\r\nYellow Stars can help to increase that.  Now, find a Yellow Star.",
-		"Strength", 1, true, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : strength
+		thisName = "Strength";
+		nextName = new string[1];
+		nextName[0] = "More Strength";
+		quest = new Quest (quests.Count, thisName,
+		"Ima needs physical strength to explore the forest.\r\nYellow Stars can help to increase that.",
+		"Strength", 1, true, nextName,
+		-1, -1, -1, -1,
 		true, false, false, false, false);
 		quests.Add (quest);
 
-		// quest 1 : strength
-		quest = new Quest (quests.Count, "Strength 2", "Nice!  With enough physical strengh, Ima's existence becomes clearer.",
-		"Strength", 1, false, quests.Count-1, quests.Count+1, 1000, -1,
+		// quest : more strength
+		thisName = "More Strength";
+		nextName = new string[1];
+		nextName[0] = "Wisdom Tree";
+		quest = new Quest (quests.Count, thisName,
+		"With enough physical strengh, Ima's existence becomes clearer.\r\nShift / Space / Right Click to move faster.",
+		"Strength", 1, false, nextName,
+		1000, 1000, -1, -1,
 		true, false, false, false, false);
 		quests.Add (quest);
 
-		// quest 2 : find the wisdom tree
-		quest = new Quest (quests.Count, "Wisdom", "But physical strength is not the only thing that is needed.\r\nIf a Kumu has questions, he or she will seek help from the Wisdom Tree.",
-		"WisdomTree", 1, false, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : find the wisdom tree
+		thisName = "Wisdom Tree";
+		nextName = new string[1];
+		nextName[0] = "Courage";
+		quest = new Quest (quests.Count, thisName,
+		"But physical strength is not the only thing that is needed.\r\nA Kumu can always ask the Wisdom Tree.",
+		"WisdomTree", 1, false, nextName,
+		-1, -1, -1, -1,
 		true, false, true, false, false);
 		quests.Add (quest);
 
-		// quest 3 : collect red star
-		quest = new Quest (quests.Count, "Courage 1", "Wisdom Tree says, a true Kumu needs courage to survive the Fear Forest.\r\nCourage can be gained from Red Stars.  Now, find a Red Star.",
-		"Courage", 1, false, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : collect red star
+		thisName = "Courage";
+		nextName = new string[1];
+		nextName[0] = "More Courage";
+		quest = new Quest (quests.Count, thisName,
+		"Wisdom Tree: A true Kumu needs courage to survive the Fear Forest.\r\nCourage can be gained from Red Stars.",
+		"Courage", 1, false, nextName,
+		-1, -1, -1, -1,
 		true, true, false, false, false);
 		quests.Add (quest);
 
-		// quest 4 : courage
-		quest = new Quest (quests.Count, "Courage 2", "Courage lets Ima see things more clear. That's excatly what Ima needs now.",
-		"Courage", 1, false, quests.Count-1, quests.Count+1, -1, 800,
+		// quest : courage
+		thisName = "More Courage";
+		nextName = new string[3];
+		nextName[0] = "Ghosts 1";
+		nextName[1] = "Ghosts 2";
+		nextName[2] = "Ghosts 3";
+		quest = new Quest (quests.Count, thisName,
+		"Courage lets Ima see things clearly. That's excatly what Ima needs.",
+		"Courage", 1, false, nextName,
+		-1, -1, 0, 800,
 		true, false, false, false, false);
 		quests.Add (quest);
 
-		// quest 5 : ghosts
-		quest = new Quest (quests.Count, "Ghosts", "Wisdom Tree also says, in the Fear Forest there live Ghosts.  If Ima gets too close, \r\nthey will take away Ima's physical strength.  Shift / Space / Right Click to run.",
-		"Monster", 5, false, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : ghosts 1
+		thisName = "Ghosts 1";
+		nextName = new string[1];
+		nextName[0] = "Strength Drop";
+		quest = new Quest (quests.Count, thisName,
+		"Wisdom Tree:  In the Fear Forest there live Ghosts.\r\nGhosts will take away Ima's physical strength.",
+		"Monster", 3, false, nextName,
+		0, 500, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 6 : fear
-		quest = new Quest (quests.Count, "Fear", "Fear is consuming poor Ima.  Ima's vision gets worse and worse, so does Ima's strength.",
-		"Monster", 10, false, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : ghosts 2
+		thisName = "Ghosts 2";
+		nextName = new string[1];
+		nextName[0] = "Cannot See";
+		quest = new Quest (quests.Count, thisName,
+		"Wisdom Tree:  In the Fear Forest there live Ghosts.\r\nGhosts will take away Ima's physical strength.",
+		"Monster", 3, false, nextName,
+		-1, -1, 900, 1000,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 7 : stay with ghosts
-		quest = new Quest (quests.Count, "Stay with Ghosts 1", "Ghosts are everywhere.  There is no way to get rid of them. Is there?",
-		"Monster", 20, false, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : ghosts 3
+		thisName = "Ghosts 3";
+		nextName = new string[1];
+		nextName[0] = "More Ghosts";
+		quest = new Quest (quests.Count, thisName,
+		"Wisdom Tree:  In the Fear Forest there live Ghosts.\r\nGhosts will take away Ima's physical strength.",
+		"Monster", 5, false, nextName,
+		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 8 : stay with ghosts
-		quest = new Quest (quests.Count, "Stay with Ghosts 2", "Wait, some Ghosts are fading away.",
-		"Monster", 25, false, quests.Count-1, quests.Count+1, -1, 800,
+		// quest : Strength Drop
+		thisName = "Strength Drop";
+		nextName = new string[1];
+		nextName[0] = "More Ghosts";
+		quest = new Quest (quests.Count, thisName,
+		"Fear is consuming poor Ima.  Ima's strength is droping.",
+		"Monster", 5, false, nextName,
+		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 9 : stay with ghosts
-		quest = new Quest (quests.Count, "Stay with Ghosts 3", "Whatever Ima did works! Ghosts are fading even more.",
-		"Monster", 25, false, quests.Count-1, quests.Count+1, -1, 600,
+		// quest : Cannot See
+		thisName = "Cannot See";
+		nextName = new string[1];
+		nextName[0] = "More Ghosts";
+		quest = new Quest (quests.Count, thisName,
+		"Courage is gone. Ima is too afraid to see anything.",
+		"Monster", 5, false, nextName,
+		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 10 : stay with ghosts
-		quest = new Quest (quests.Count, "Stay with Ghosts 4", "What if Ima can find a way to be with them, without losing too much strength?",
-		"Monster", 30, false, quests.Count-1, quests.Count+1, -1, 300,
+		// quest : More Ghosts
+		thisName = "More Ghosts";
+		nextName = new string[3];
+		nextName[0] = "Everywhere 1";
+		nextName[1] = "Everywhere 2";
+		nextName[2] = "Everywhere 3";
+		quest = new Quest (quests.Count, thisName,
+		"More of them are coming...",
+		"Monster", 10, false, nextName,
+		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 11 : ask for the secret of ghosts
-		quest = new Quest (quests.Count, "Secret of Ghosts", "That is weird.  Maybe Wisdom Tree knows the answer.",
-		"WisdomTree", 1, false, quests.Count-1, quests.Count+1, -1, -1,
+		// quest : Everywhere 1
+		thisName = "Everywhere 1";
+		nextName = new string[2];
+		nextName[0] = "Solution 1";
+		nextName[1] = "Solution 2";
+		quest = new Quest (quests.Count, thisName,
+		"Ghosts are everywhere.  There is no way to get rid of them...",
+		"Monster", 5, false, nextName,
+		0, 500, -1, -1,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : Everywhere 2
+		thisName = "Everywhere 2";
+		nextName = new string[1];
+		nextName[0] = "Disappear";
+		quest = new Quest (quests.Count, thisName,
+		"Ghosts are everywhere.  There is no way to get rid of them...",
+		"Monster", 5, false, nextName,
+		-1, -1, 0, 500,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : Everywhere 3
+		thisName = "Everywhere 3";
+		nextName = new string[2];
+		nextName[0] = "Solution 1";
+		nextName[1] = "Solution 2";
+		quest = new Quest (quests.Count, thisName,
+		"Ghosts are everywhere.  There is no way to get rid of them...",
+		"Monster", 10, false, nextName,
+		-1, -1, -1, -1,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : Solution 1
+		thisName = "Solution 1";
+		nextName = new string[1];
+		nextName[0] = "Disappear";
+		quest = new Quest (quests.Count, thisName,
+		"There must be a way to deal with them.",
+		"Monster", 5, false, nextName,
+		-1, -1, 0, 300,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : Solution 2
+		thisName = "Solution 2";
+		nextName = new string[1];
+		nextName[0] = "Closer";
+		quest = new Quest (quests.Count, thisName,
+		"There must be a way to deal with them.",
+		"Monster", 10, false, nextName,
+		-1, -1, -1, -1,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : Disappear
+		thisName = "Disappear";
+		nextName = new string[1];
+		nextName[0] = "Secret 1";
+		quest = new Quest (quests.Count, thisName,
+		"Is that true? Some Ghosts are fading.",
+		"Monster", 5, false, nextName,
+		800, 1000, 0, 200,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : Closer
+		thisName = "Closer";
+		nextName = new string[1];
+		nextName[0] = "Secret 1";
+		quest = new Quest (quests.Count, thisName,
+		"If Ima can get a little closer...",
+		"Monster", 5, false, nextName,
+		800, 1000, 0, 200,
+		true, false, false, false, true);
+		quests.Add (quest);
+
+		// quest : secret
+		thisName = "Secret 1";
+		nextName = new string[1];
+		nextName[0] = "Secret 2";
+		quest = new Quest (quests.Count, thisName,
+		"That is weird.  Maybe Wisdom Tree knows the answer.",
+		"WisdomTree", 1, false, nextName,
+		-1, -1, -1, -1,
 		true, false, true, false, true);
 		quests.Add (quest);
 
-		// quest 12 : find the secret of ghosts
-		quest = new Quest (quests.Count, "Find Secret", "Wisdom Tree: A true Kumu will not fear Ghosts. They are just a reflection of your own fear. \r\nLet them stay with you, and find your courage from fear.",
-		"Monster", 35, false, quests.Count-1, quests.Count+1, -1, 0,
+		// quest : secret 2
+		thisName = "Secret 2";
+		nextName = new string[1];
+		nextName[0] = "Spirit";
+		quest = new Quest (quests.Count, thisName,
+		"Wisdom Tree: A true Kumu shall not be afraid of Ghosts. They are nothing more than a reflection of your own fear.",
+		"Monster", 5, false, nextName,
+		950, 1000, 0, 50,
 		true, false, false, false, true);
 		quests.Add (quest);
 
-		// quest 13 : find spirit tree
-		quest = new Quest (quests.Count, "Sprite", "Is that the secret of courage? Maybe Spirit Tree knows.",
-		"SpiritTree", 1, false, quests.Count-1, -1, -1, -1,
+		// quest : spirit
+		thisName = "Spirit";
+		nextName = new string[0];
+		quest = new Quest (quests.Count, thisName,
+		"Wisdom Tree: Now, go to find the Spirit Tree.",
+		"SpiritTree", 1, false, nextName,
+		-1, -1, -1, -1,
 		true, false, false, true, true);
 		quests.Add (quest);
 
-		// foreach (Quest quest in quests)
-		// {
-		// 	// Debug.Log (quest.id + " : " + quest.next);
-		// 	Debug.Log (quest.id + " : " + quest.text);
-		// }
-
-		enabled = false;
-	}
-
-	void OnEnable ()
-	{
-		if (quests.Count <= 0)
+		if (quests == null || quests.Count <= 0)
 		{
 			return;
 		}
 
 		foreach (Quest quest in quests)
 		{
-			if ((quest.prerequisite < 0 || quest.isOpen) && !quest.isFinished)
+			if (quest.isOpen && !quest.isFinished)
 			{
 				UI_Quest.SetActive (true);
 				quest.isOpen = true;
@@ -214,16 +360,29 @@ public class QuestManager : MonoBehaviour {
 			return;
 		}
 
+		Debug.Log ("Complete " + quests[id].name);
 		quests[id].isFinished = true;
 		quests[id].finishTime = Time.deltaTime;
 
+		foreach (Quest quest in quests)
+		{
+			if (quest.isOpen)
+			{
+				quest.isOpen = false;
+			}
+		}
+
 		GameController.instance.level += 1;
 
-		if (quests[id].next != -1)
+		if (quests[id].next.Length > 0)
 		{
-			if (quests[id].next < quests.Count)
+			foreach (string name in quests[id].next)
 			{
-				quest = quests[quests[id].next];
+				quest = FindByName (name);
+				if (quest == null)
+				{
+					return;
+				}
 				quest.isOpen = true;
 				questName.text = quest.name;
 				questText.text = quest.text;
@@ -233,6 +392,15 @@ public class QuestManager : MonoBehaviour {
 		else
 		{
 			GameController.instance.GameComplete ();
+		}
+
+		// debug
+		foreach (Quest quest in quests)
+		{
+			if (quest.isOpen)
+			{
+				Debug.Log ("Open: " + quest.name);
+			}
 		}
 	}
 
@@ -310,17 +478,17 @@ public class QuestManager : MonoBehaviour {
 
 		if (quests[id].objects.Count >= quests[id].num)
 		{
-			if (quests[id].strength != -1)
+			if (quests[id].minStrength != -1 && quests[id].maxStrength != -1)
 			{
-				if (player.strength >= quests[id].strength)
+				if (player.strength >= quests[id].minStrength && player.strength <= quests[id].maxStrength)
 				{
 					CompleteQuest (id);
 					return true;
 				}
 			}
-			else if (quests[id].fear != -1)
+			else if (quests[id].minFear != -1 && quests[id].maxFear != -1)
 			{
-				if (player.fear <= quests[id].fear)
+				if (player.fear >= quests[id].minFear && player.fear <= quests[id].maxFear)
 				{
 					CompleteQuest (id);
 					return true;
@@ -334,5 +502,41 @@ public class QuestManager : MonoBehaviour {
 		}
 
 		return false;
+	}
+
+	public int FindIDByName (string name)
+	{
+		if (quests == null || quests.Count <= 0)
+		{
+			return -1;
+		}
+
+		foreach (Quest quest in quests)
+		{
+			if (quest.name == name)
+			{
+				return quest.id;
+			}
+		}
+
+		return -1;
+	}
+
+	public Quest FindByName (string name)
+	{
+		if (quests == null || quests.Count <= 0)
+		{
+			return null;
+		}
+
+		foreach (Quest quest in quests)
+		{
+			if (quest.name == name)
+			{
+				return quest;
+			}
+		}
+
+		return null;
 	}
 }

@@ -42,7 +42,7 @@ public class IntroManager : MonoBehaviour {
 		{
 			lines.Add ("Ima, you are a true Kumu now.");
 			lines.Add ("The Fear Forest has witnessed your fear and courage.");
-			lines.Add ("You already knew all the secrets a Kumu should to know.");
+			lines.Add ("You already knew all the secrets a Kumu needs to know.");
 			lines.Add ("Now, you need to bring the knowledge back to your tribe.");
 			lines.Add ("It is time to go home.");
 		}

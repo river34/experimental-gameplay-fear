@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 	public bool map_right;
 	public bool map_bottom;
 	public bool map_left;
+	public float maxView = 15f;
 
 	// strength
 	public float strength;
@@ -25,8 +26,8 @@ public class PlayerController : MonoBehaviour {
 	public int mid_fear = 600;
 	public int high_fear = 800;
 	private int max_fear = 1000;
-	private int fearGain = 20;
-	private int fearLoss = 5;
+	private int fearGain = 10;
+	private int fearLoss = 10;
 	private int courageGain = 100;
 
 	// position
@@ -45,6 +46,7 @@ public class PlayerController : MonoBehaviour {
 	private bool is_left;
 	private bool is_up;
 	private List<GameObject> monsters = new List<GameObject>();
+	private List<GameObject> shadows = new List<GameObject>();
 
 	// quest
 	private QuestManager questManager;
@@ -59,6 +61,13 @@ public class PlayerController : MonoBehaviour {
 	public GameObject complete;
 	private List<GameObject> completes = new List<GameObject>();
 
+	// navigation
+	private GameObject UI_Nav;
+	private RectTransform UI_Arrow;
+	private RectTransform canvasRect;
+	private List<string> navList = new List<string>();
+	private Vector2 thisViewpoint;
+
 	private float reverseMul = 0.001f;
 
 	void Awake ()
@@ -69,6 +78,12 @@ public class PlayerController : MonoBehaviour {
 		halfClear = Color.yellow;
 		halfClear.a = 0.2f;
 		questManager = GameController.instance.questManager;
+		UI_Nav = GameController.instance.UI_Nav;
+		UI_Arrow = UI_Nav.transform.Find ("Arrow").gameObject.GetComponent <RectTransform> ();
+		canvasRect = UI_Nav.GetComponent <RectTransform> ();
+		navList.Add ("WisdomTree");
+		navList.Add ("Courage");
+		navList.Add ("SpiritTree");
 	}
 
 	void Start ()
@@ -77,6 +92,7 @@ public class PlayerController : MonoBehaviour {
 		fear = GameController.instance.playerFear;
 		last_position = transform.position;
 		render.color = Color.Lerp (halfClear, Color.yellow, strength * reverseMul);
+		thisViewpoint = Camera.main.WorldToViewportPoint (transform.position);
 	}
 
 	// Update is called once per frame
@@ -85,6 +101,7 @@ public class PlayerController : MonoBehaviour {
 		UpdateInput ();
 		UpdateMap ();
 		UpdateStatus ();
+		UpdateNavigate ();
 	}
 
 	void LateUpdate ()
@@ -142,7 +159,7 @@ public class PlayerController : MonoBehaviour {
 	// reach border of the current map
 	void ReachBoarder ()	// up - 0, right - 1, bottom - 2, left - 3, none - -1
 	{
-		if (transform.position.z >= map.up - 15f)
+		if (transform.position.z > map.up - maxView)
 		{
 			map_up = true;
 		}
@@ -150,7 +167,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_up = false;
 		}
-		if (transform.position.x >= map.right - 15f)
+		if (transform.position.x > map.right - maxView)
 		{
 			map_right = true;
 		}
@@ -158,7 +175,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_right = false;
 		}
-		if (transform.position.z <= map.bottom + 5f)
+		if (transform.position.z < map.bottom + 4.5f)
 		{
 			map_bottom = true;
 		}
@@ -166,7 +183,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_bottom = false;
 		}
-		if (transform.position.x <= map.left + 15f)
+		if (transform.position.x < map.left + maxView)
 		{
 			map_left = true;
 		}
@@ -319,19 +336,20 @@ public class PlayerController : MonoBehaviour {
 
 	void UpdateStatus ()
 	{
+		// Debug.Log (monsters.Count + ", " + shadows.Count + ", " + strength + ", " + fear);
 		if (is_moving)
 		{
 			if (monsters.Count > 0 && fear > high_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 3) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count * monsters.Count + 1) * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > mid_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 2) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > low_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * (Mathf.Log (monsters.Count) + 1) * Time.deltaTime);
 			}
 			else
 			{
@@ -342,19 +360,19 @@ public class PlayerController : MonoBehaviour {
 		{
 			if (monsters.Count > 0 && fear > high_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 3) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count * monsters.Count + 1) * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > mid_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 2) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > low_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * (Mathf.Log (monsters.Count) + 1) * Time.deltaTime);
 			}
 		}
 
-
+		/*
 		if (is_running)
 		{
 			if (monsters.Count > 0)
@@ -367,6 +385,23 @@ public class PlayerController : MonoBehaviour {
 			if (monsters.Count > 0)
 			{
 				LossFear (fearLoss * monsters.Count * Time.deltaTime);
+			}
+		}
+		*/
+
+		if (shadows.Count > 0)
+		{
+			float fear = 0;
+			fear -= fearLoss * monsters.Count;
+			fear += fearGain * (shadows.Count - monsters.Count);
+			// Debug.Log (fearLoss * monsters.Count + ", " + fearGain * (shadows.Count - monsters.Count));
+			if (fear > 0)
+			{
+				GainFear (fear * Time.deltaTime);
+			}
+			else
+			{
+				LossFear (-fear * Time.deltaTime);
 			}
 		}
 	}
@@ -387,14 +422,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void LossStrength (float loss)
 	{
-		if (fear >= max_fear)
-		{
-			strength -= loss * 2;
-		}
-		else
-		{
-			strength -= loss;
-		}
+		strength -= loss;
 
 		if (strength < min_strength)
 		{
@@ -456,6 +484,10 @@ public class PlayerController : MonoBehaviour {
 		{
 			monsters.Add (other.gameObject);
 		}
+		if (other.gameObject.CompareTag ("Shadow"))
+		{
+			shadows.Add (other.gameObject);
+		}
 		if (other.gameObject.CompareTag ("WisdomTree"))
 		{
 			//
@@ -481,12 +513,12 @@ public class PlayerController : MonoBehaviour {
 				{
 					questManager.quests[quest.id].objects.Add (other.gameObject);
 					bool completeNew = questManager.CheckForComplete (quest.id, this);
-					if (completeNew)
-					{
-						GameObject completeObject = Instantiate (complete, transform, false);
-						completeObject.AddComponent <CompleteController> ();
-						completes.Add (completeObject);
-					}
+					// if (completeNew)
+					// {
+					// 	GameObject completeObject = Instantiate (complete, transform, false);
+					// 	completeObject.AddComponent <CompleteController> ();
+					// 	completes.Add (completeObject);
+					// }
 				}
 			}
 		}
@@ -496,12 +528,105 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (other.gameObject.CompareTag ("Monster"))
 		{
-			RemoveMonster (other.gameObject);
+			monsters.Remove (other.gameObject);
+		}
+		if (other.gameObject.CompareTag ("Shadow"))
+		{
+			shadows.Remove (other.gameObject);
 		}
 	}
 
-	public void RemoveMonster (GameObject gameObject)
+	public void RemoveMonster (GameObject monster, GameObject shadow)
 	{
-		monsters.Remove (gameObject);
+		monsters.Remove (monster);
+		shadows.Remove (shadow);
+	}
+
+	void UpdateNavigate ()
+	{
+		GameObject[] gameObjects = null;
+
+		if (questManager != null && questManager.quests.Count > 0)
+		{
+			foreach (Quest quest in questManager.quests)
+			{
+				if (quest.isFinished)
+				{
+					continue;
+				}
+				if (!quest.isOpen)
+				{
+					continue;
+				}
+				// find the nearest object
+				if (quest.tag != null)
+				{
+					if (!navList.Contains (quest.tag))
+					{
+						break;
+					}
+					gameObjects = GameObject.FindGameObjectsWithTag (quest.tag);
+					break;
+				}
+			}
+		}
+
+		if (gameObjects != null && gameObjects.Length > 0)
+		{
+			float distance = -1;
+			GameObject nearest = null;
+			foreach (GameObject gameObject in gameObjects)
+			{
+				Vector3 offset = gameObject.transform.position - transform.position;
+				float newDistance = offset.sqrMagnitude;
+				if (distance == -1 || nearest == null)
+				{
+					distance = newDistance;
+					nearest = gameObject;
+				}
+				else
+				{
+					if (newDistance < distance)
+					{
+						distance = newDistance;
+						nearest = gameObject;
+					}
+				}
+			}
+
+			if (nearest != null)
+			{
+				if (!UI_Nav.activeSelf)
+					UI_Nav.SetActive (true);
+
+				Vector2 targetViewpoint = Camera.main.WorldToViewportPoint (nearest.transform.position);
+				Vector2 thisViewpoint = Camera.main.WorldToViewportPoint (transform.position);
+				// Vector2 screenPosition = new Vector2 (
+				// 	((targetViewpoint.x * canvasRect.sizeDelta.x) - (canvasRect.sizeDelta.x * 0.5f)),
+				// 	((targetViewpoint.y * canvasRect.sizeDelta.y) - (canvasRect.sizeDelta.y * 0.5f)));
+				//
+				// Vector2 screenPosition = new Vector2 (
+				// 	(targetViewpoint.x * canvasRect.sizeDelta.x / 2),
+				// 	(targetViewpoint.y * canvasRect.sizeDelta.y / 2 ));
+				//
+				// Debug.Log (nearest.name + " : " + targetViewpoint + " " + screenPosition);
+				// UI_Arrow.localPosition = screenPosition;
+
+				float angle = Mathf.Atan2 (targetViewpoint.y - thisViewpoint.y, targetViewpoint.x - thisViewpoint.x) * Mathf.Rad2Deg;
+				// Debug.Log (nearest.name + " : " + targetViewpoint + " " + thisViewpoint + " " + angle);
+				// UI_Arrow.localRotation = Quaternion.Slerp (UI_Arrow.localRotation, Quaternion.AngleAxis (angle, Vector3.forward), Time.deltaTime * 2.0f);
+				UI_Arrow.localRotation = Quaternion.AngleAxis (angle, Vector3.forward);
+			}
+			else
+			{
+				if (UI_Nav.activeSelf)
+					UI_Nav.SetActive (false);
+			}
+		}
+		else
+		{
+			if (UI_Nav.activeSelf)
+				UI_Nav.SetActive (false);
+		}
 	}
 }

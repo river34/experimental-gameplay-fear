@@ -73,6 +73,7 @@ public class MapGenerator : MonoBehaviour {
 		}
 
 		GameObject subMapObject = new GameObject ("SubMap");
+		subMapObject.tag = "Floor";
 		subMapObject.AddComponent <MapController> ();
 		subMapObject.transform.SetParent (mapHolder);
 		subMapHolder = subMapObject.transform;
@@ -126,7 +127,7 @@ public class MapGenerator : MonoBehaviour {
 
 		if (!noWisdomTree)
 		{
-			LayoutObjectAtRandom (wisdomTreeTiles, 1, 3, offset_x, offset_y);
+			LayoutObjectAtRandom (wisdomTreeTiles, 0, 1, offset_x, offset_y);
 		}
 
 		if (!noSpiritTree)
@@ -137,20 +138,20 @@ public class MapGenerator : MonoBehaviour {
 		if (!noStrength)
 		{
 			// LayoutObjectAtRandom (strengthTiles, 10, 20, offset_x, offset_y);
-			int strengthCount = Mathf.Max (20, 35 - GameController.instance.level);
+			int strengthCount = Mathf.Max (20, 25 - (int) Mathf.Log (GameController.instance.level));
 			weirdaLayoutObjectAroundLocationsAtRandom (strengthTiles, strengthCount - 10, strengthCount, offset_x, offset_y, centers);
 		}
 
 		if (!noCourage)
 		{
 			// LayoutObjectAtRandom (courageTiles, 5, 10, offset_x, offset_y);
-			weirdaLayoutObjectAroundLocationsAtRandom (courageTiles, 4, 4, offset_x, offset_y, centers);
+			weirdaLayoutObjectAroundLocationsAtRandom (courageTiles, 2, 2, offset_x, offset_y, centers);
 		}
 
 		if (!noMonster)
 		{
 			// int monsterCount = (int) Mathf.Log (GameController.instance.level, 2f);
-			int monsterCount = GameController.instance.level * 2;
+			int monsterCount = GameController.instance.level;
 			LayoutObjectAtRandom (monsterTiles, monsterCount, monsterCount, offset_x, offset_y);
 		}
 
