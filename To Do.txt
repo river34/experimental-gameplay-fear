@@ -3,6 +3,8 @@
 - more playtest
 - audio track (Colin)
 - voice over
+- browser freezing problem after "ghosts" quest - memory problem?
+- browser lagging problem
 
 # Done
 - created main mechanism (first iteration)

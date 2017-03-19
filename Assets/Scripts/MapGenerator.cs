@@ -44,7 +44,6 @@ public class MapGenerator : MonoBehaviour {
 	private Transform mapHolder;
 	private Transform subMapHolder;
 	private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
-	private List <Vector3> centers = new List <Vector3> ();
 
 	private bool noMonster;
 	private bool noStrength;
@@ -52,10 +51,60 @@ public class MapGenerator : MonoBehaviour {
 	private bool noWisdomTree;
 	private bool noSpiritTree;
 
+	public List<GameObject> lands = new List <GameObject> ();
+	public List<GameObject> trees = new List <GameObject> ();
+	public List<GameObject> monsters = new List <GameObject> ();
+	public List<GameObject> strengths = new List <GameObject> ();
+
 	void Awake ()
 	{
 		map_width = width * size;
 		map_height = height * size;
+
+		// tree pool
+		if (trees.Count <= 0)
+		{
+			int objectCount = 30;
+			GameObject tileChoice;
+			GameObject tile;
+			for (int i = 0; i < objectCount; i++)
+			{
+				tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
+				tile = Instantiate (tileChoice);
+				tile.SetActive (false);
+				trees.Add (tile);
+			}
+		}
+
+		// strength pool
+		if (strengths.Count <= 0)
+		{
+			int objectCount = 10;
+			GameObject tileChoice;
+			GameObject tile;
+			for (int i = 0; i < objectCount; i++)
+			{
+				tileChoice = strengthTiles[Random.Range (0, strengthTiles.Length)];
+				tile = Instantiate (tileChoice);
+				tile.SetActive (false);
+				strengths.Add (tile);
+			}
+		}
+
+		// monster pool
+		if (monsters.Count <= 0)
+		{
+			int objectCount = 10;
+			GameObject tileChoice;
+			GameObject tile;
+			for (int i = 0; i < objectCount; i++)
+			{
+				tileChoice = monsterTiles[Random.Range (0, monsterTiles.Length)];
+				tile = Instantiate (tileChoice);
+				tile.SetActive (false);
+				monsters.Add (tile);
+			}
+		}
 	}
 
 	public void RemoveMap (float offset_x, float offset_y)
@@ -70,6 +119,8 @@ public class MapGenerator : MonoBehaviour {
 		{
 			return;
 		}
+
+		Debug.Log (trees.Count + ", " + strengths.Count + ", " + monsters.Count);
 
 		if (mapHolder == null)
 		{
@@ -108,29 +159,40 @@ public class MapGenerator : MonoBehaviour {
 		map.bottom = -map_height/2 + offset_y;
 		map.left = -map_width/2 + offset_x;
 
+		GameObject tile;
+		GameObject tileChoice;
+
+		// lands
+		tileChoice = landTile[Random.Range (0, landTile.Length)];
+		tile = Instantiate (tileChoice) as GameObject;
+		tile.transform.position = new Vector3 (-map_width/2 + offset_x, 0f, -map_height/2 + offset_y);
+		tile.transform.localScale = new Vector3 (map_width, 1, map_height);
+		tile.transform.SetParent (subMapHolder);
+
 		for (int x = 0; x < width; x++)
 		{
 			for (int y = 0; y < height; y++)
 			{
-				GameObject tile;
-				GameObject tileChoice;
-				tileChoice = landTile[Random.Range (0, landTile.Length)];
-				tile = Instantiate (tileChoice) as GameObject;
-				tile.transform.position = new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y);
-				tile.transform.SetParent (subMapHolder);
-
+				// trees
 				if (map.grid[x,y] == 2)
 				{
-					tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
-					tile = Instantiate (tileChoice) as GameObject;
+					if (trees.Count > 0)
+					{
+						tile = trees[0];
+						trees.RemoveAt (0);
+						tile.SetActive (true);
+					}
+					else
+					{
+						tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
+						tile = Instantiate (tileChoice) as GameObject;
+					}
 					tile.transform.position = new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y);
 					tile.transform.SetParent (subMapHolder);
 					gridPositions.Remove (new Vector3 (x, 0f, y));
 				}
 			}
 		}
-
-		centers.Clear ();
 
 		if (!noWisdomTree)
 		{
@@ -144,22 +206,20 @@ public class MapGenerator : MonoBehaviour {
 
 		if (!noStrength)
 		{
-			// LayoutObjectAtRandom (strengthTiles, 10, 20, offset_x, offset_y);
 			int strengthCount = Mathf.Max (10, 20 - GameController.instance.level);
-			weirdaLayoutObjectAroundLocationsAtRandom (strengthTiles, strengthCount - 5, strengthCount, offset_x, offset_y, centers);
+			LayoutObjectAtRandom (strengthTiles, strengthCount - 5, strengthCount, offset_x, offset_y, "Strength");
 		}
 
 		if (!noCourage)
 		{
-			// LayoutObjectAtRandom (courageTiles, 5, 10, offset_x, offset_y);
-			weirdaLayoutObjectAroundLocationsAtRandom (courageTiles, 2, 2, offset_x, offset_y, centers);
+			LayoutObjectAtRandom (courageTiles, 2, 2, offset_x, offset_y);
 		}
 
 		if (!noMonster)
 		{
 			// int monsterCount = (int) Mathf.Log (GameController.instance.level, 2f);
 			int monsterCount = GameController.instance.level;
-			LayoutObjectAtRandom (monsterTiles, monsterCount, monsterCount, offset_x, offset_y);
+			LayoutObjectAtRandom (monsterTiles, monsterCount, monsterCount, offset_x, offset_y, "Monster");
 		}
 
 		maps.Add (map);
@@ -249,46 +309,77 @@ public class MapGenerator : MonoBehaviour {
 		return null;
 	}
 
-	void LayoutObjectAtRandom (GameObject[] tileArray, int minimum, int maximum, float offset_x, float offset_y)
+	void LayoutObjectAtRandom (GameObject[] tileArray, int minimum, int maximum, float offset_x, float offset_y, string tag)
 	{
-		int objectCount = Random.Range (minimum, maximum+1);
-
-		for (int i = 0; i < objectCount; i++)
+		Vector3 randomPosition;
+		GameObject tile;
+		if (tag == "Strength")
 		{
-			Vector3 randomPosition = RandomPosition ();
-			randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
-			randomPosition.y = 0f;
-			randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
-
-			GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
-			GameObject tile = Instantiate (tileChoice, randomPosition, Quaternion.identity);
-			tile.transform.SetParent (subMapHolder);
-
-			centers.Add (randomPosition);
+			int objectCount = Random.Range (minimum, maximum+1);
+			for (int i = 0; i < objectCount; i++)
+			{
+				randomPosition = RandomPosition ();
+				randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
+				randomPosition.y = 0f;
+				randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+				if (strengths.Count > 0)
+				{
+					tile = strengths[0];
+					strengths.RemoveAt (0);
+				}
+				else
+				{
+					GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
+					tile = Instantiate (tileChoice);
+				}
+				tile.transform.position = randomPosition;
+				tile.transform.SetParent (subMapHolder);
+			}
+		}
+		else if (tag == "Monster")
+		{
+			int objectCount = Random.Range (minimum, maximum+1);
+			for (int i = 0; i < objectCount; i++)
+			{
+				randomPosition = RandomPosition ();
+				randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
+				randomPosition.y = 0f;
+				randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+				if (monsters.Count > 0)
+				{
+					tile = monsters[0];
+					monsters.RemoveAt (0);
+				}
+				else
+				{
+					GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
+					tile = Instantiate (tileChoice);
+				}
+				tile.transform.position = randomPosition;
+				tile.transform.SetParent (subMapHolder);
+			}
+		}
+		else
+		{
+			LayoutObjectAtRandom (tileArray, minimum, maximum, offset_x, offset_y);
 		}
 	}
 
-	void weirdaLayoutObjectAroundLocationsAtRandom (GameObject[] tileArray, int minimum, int maximum, float offset_x, float offset_y, List<Vector3> centers)
+	void LayoutObjectAtRandom (GameObject[] tileArray, int minimum, int maximum, float offset_x, float offset_y)
 	{
 		int objectCount = Random.Range (minimum, maximum+1);
-
+		Vector3 randomPosition;
+		GameObject tileChoice;
+		GameObject tile;
 		for (int i = 0; i < objectCount; i++)
 		{
-			Vector3 randomPosition;
-			if (centers.Count > 0)
-			{
-				randomPosition = RandomPositionAroundCenters (centers);
-			}
-			else
-			{
-				randomPosition = RandomPosition ();
-			}
+			randomPosition = RandomPosition ();
 			randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
 			randomPosition.y = 0f;
 			randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
 
-			GameObject tileChoice = tileArray[Random.Range (0, tileArray.Length)];
-			GameObject tile = Instantiate (tileChoice, randomPosition, Quaternion.identity);
+			tileChoice = tileArray[Random.Range (0, tileArray.Length)];
+			tile = Instantiate (tileChoice, randomPosition, Quaternion.identity);
 			tile.transform.SetParent (subMapHolder);
 		}
 	}
@@ -296,29 +387,6 @@ public class MapGenerator : MonoBehaviour {
 	Vector3 RandomPosition ()
 	{
 		int randomIndex = Random.Range (0, gridPositions.Count);
-		Vector3 randomPosition = gridPositions[randomIndex];
-		gridPositions.RemoveAt (randomIndex);
-		return randomPosition;
-	}
-
-	Vector3 RandomPositionAroundCenters (List<Vector3> centers) // distance <3
-	{
-		int randomIndex = Random.Range (0, centers.Count);
-		int randomDistanceX = Random.Range (-2, 2);
-		int randomDistanceZ = Random.Range (-2, 2);
-		if (randomDistanceX == 0 && randomDistanceZ == 0)
-		{
-			randomDistanceZ = Random.Range (2, 0);
-		}
-		randomIndex += randomDistanceX + randomDistanceZ * width;
-		while (randomIndex > gridPositions.Count - 1)
-		{
-			randomIndex -= 1;
-		}
-		while (randomIndex < 0)
-		{
-			randomIndex += 1;
-		}
 		Vector3 randomPosition = gridPositions[randomIndex];
 		gridPositions.RemoveAt (randomIndex);
 		return randomPosition;

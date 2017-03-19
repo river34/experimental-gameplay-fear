@@ -195,7 +195,7 @@ public class GameController : MonoBehaviour {
 	public void GameOver ()
 	{
 		Destroy (playerObject);
-		Destroy (mapObject);
+		// Destroy (mapObject);
 		playerObject = null;
 		mapObject = null;
 		UI_Game.SetActive (false);
@@ -206,7 +206,7 @@ public class GameController : MonoBehaviour {
 	public void GameComplete ()
 	{
 		Destroy (playerObject);
-		Destroy (mapObject);
+		// Destroy (mapObject);
 		playerObject = null;
 		mapObject = null;
 		UI_Game.SetActive (false);

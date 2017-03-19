@@ -26,19 +26,45 @@ public class MonsterController : MonoBehaviour {
 	private GameObject shadow;
 	private Transform mapHolder;
 
+	private MapGenerator map;
+
 	void Awake ()
 	{
-		target = GameObject.FindGameObjectWithTag ("Player").transform;
-		player = target.GetComponent <PlayerController> ();
 		render = transform.Find ("Sprite").GetComponent <SpriteRenderer>();
 		farDistance = 15f * 15f;
 		closeDistance = Random.Range (4f, 16f);
 
-		// shadow
-		mapHolder = GameObject.Find ("Map").transform;
+		// map generator
+		map = GameObject.FindGameObjectWithTag ("GameController").GetComponent <MapGenerator> ();;
 	}
 
 	void Update () {
+		if (target == null)
+		{
+			GameObject playerObject = GameObject.FindGameObjectWithTag ("Player");
+			if (playerObject != null)
+			{
+				target = playerObject.transform;
+				player = playerObject.GetComponent <PlayerController> ();
+			}
+		}
+
+		if (target == null)
+		{
+			return;
+		}
+
+		if (mapHolder == null)
+		{
+			// shadow
+			mapHolder = GameObject.Find ("Map").transform;
+		}
+
+		if (mapHolder == null)
+		{
+			return;
+		}
+
 		Vector3 distance = Vector3.zero;
 		distance.x = target.position.x - transform.position.x;
 		distance.z = target.position.z - transform.position.z;
@@ -131,14 +157,22 @@ public class MonsterController : MonoBehaviour {
 		{
 			player.RemoveMonster (gameObject, shadow);
 			Destroy (shadow);
-			Destroy (gameObject);
+			// Destroy (gameObject);
+
+			// recycle gameobjects
+			map.monsters.Add (gameObject);
+			gameObject.SetActive (false);
 		}
 
 		if (render.color.a < 0.1)
 		{
 			player.RemoveMonster (gameObject, shadow);
 			Destroy (shadow);
-			Destroy (gameObject);
+			// Destroy (gameObject);
+
+			// recycle gameobjects
+			map.monsters.Add (gameObject);
+			gameObject.SetActive (false);
 		}
 	}
 }

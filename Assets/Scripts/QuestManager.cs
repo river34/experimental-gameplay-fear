@@ -144,7 +144,7 @@ public class QuestManager : MonoBehaviour {
 		nextName[1] = "Ghosts 2";
 		nextName[2] = "Ghosts 3";
 		quest = new Quest (quests.Count, thisName,
-		"Courage lets Ima see things clearly. That's exactly what Ima needs in this darkness.",
+		"Courage lets Ima see things clearly. \r\nThat's exactly what Ima needs in this darkness.",
 		"Courage", 1, false, nextName,
 		-1, -1, 0, 800,
 		true, false, false, false, false);
@@ -313,7 +313,7 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "Spirit";
 		quest = new Quest (quests.Count, thisName,
-		"Wisdom Tree:  A true Kumu shall not be afraid of Ghosts. They are nothing more than a reflection of your own fear.",
+		"Wisdom Tree:  A true Kumu shall not be afraid of Ghosts. \r\nThey are nothing more than a reflection of your own fear.",
 		"Monster", 5, false, nextName,
 		950, 1000, 0, 50,
 		true, false, false, false, true);
