@@ -48,19 +48,19 @@ public class MapController : MonoBehaviour {
 				if (child.gameObject.CompareTag ("Tree"))
 				{
 					map.trees.Add (child.gameObject);
-					child.SetParent (transform.parent);
+					child.SetParent (map.poolHolder);
 					child.gameObject.SetActive (false);
 				}
 				else if (child.gameObject.CompareTag ("Strength"))
 				{
 					map.strengths.Add (child.gameObject);
-					child.SetParent (transform.parent);
+					child.SetParent (map.poolHolder);
 					child.gameObject.SetActive (false);
 				}
 				else if (child.gameObject.CompareTag ("Monster"))
 				{
 					map.monsters.Add (child.gameObject);
-					child.SetParent (transform.parent);
+					child.SetParent (map.poolHolder);
 					child.gameObject.SetActive (false);
 				}
 			}

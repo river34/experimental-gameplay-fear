@@ -175,6 +175,13 @@ public class GameController : MonoBehaviour {
 		else if (state == States.END)
 		{
 			GameEnd ();
+
+			if (Time.time - time > 1 && Input.GetKey ("space"))
+			{
+				InitGame ();
+				time = Time.time;
+				state = States.QUEST;
+			}
 		}
 	}
 
@@ -194,23 +201,12 @@ public class GameController : MonoBehaviour {
 
 	public void GameOver ()
 	{
-		Destroy (playerObject);
-		// Destroy (mapObject);
-		playerObject = null;
-		mapObject = null;
-		UI_Game.SetActive (false);
 		time = Time.time;
 		state = States.FAIL;
 	}
 
 	public void GameComplete ()
 	{
-		Destroy (playerObject);
-		// Destroy (mapObject);
-		playerObject = null;
-		mapObject = null;
-		UI_Game.SetActive (false);
-		soundManager.StopBackground ();
 		time = Time.time;
 		state = States.COMPLETE;
 		StartComplete ();
@@ -218,15 +214,16 @@ public class GameController : MonoBehaviour {
 
 	void GameEnd ()
 	{
+		Destroy (playerObject);
+		Destroy (mapObject);
+		playerObject = null;
+		mapObject = null;
+		UI_Game.SetActive (false);
+		soundManager.StopBackground ();
 		UI_Block.SetActive (false);
 		UI_End.SetActive (true);
 		camera.enabled = false;
 		questManager.enabled = false;
-
-		if (Time.time - time > 1 && Input.GetKey ("space"))
-		{
-			Invoke ("InitGame", gameStartDelay);
-		}
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -242,12 +239,6 @@ public class GameController : MonoBehaviour {
 
 	void InitGame ()
 	{
-		if (state == States.END)
-		{
-			time = Time.time;
-			state = States.QUEST;
-		}
-
 		// doingSetup = true;
 
 		level = 1;
@@ -271,7 +262,6 @@ public class GameController : MonoBehaviour {
 		playerComplete = 0;
 
 		mapGenerator.InitMap ();
-		mapGenerator.GenerateMap (0, 0);
 		map_width = mapGenerator.map_width;
 		map_height = mapGenerator.map_height;
 

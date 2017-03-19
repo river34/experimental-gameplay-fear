@@ -153,7 +153,7 @@ public class MonsterController : MonoBehaviour {
 	{
 		// lastFindPlayer = FindPlayer;
 
-		if (transform.localScale.x < 0.1)
+		if (transform.localScale.x < 0.1 || render.color.a < 0.1)
 		{
 			player.RemoveMonster (gameObject, shadow);
 			Destroy (shadow);
@@ -161,17 +161,7 @@ public class MonsterController : MonoBehaviour {
 
 			// recycle gameobjects
 			map.monsters.Add (gameObject);
-			gameObject.SetActive (false);
-		}
-
-		if (render.color.a < 0.1)
-		{
-			player.RemoveMonster (gameObject, shadow);
-			Destroy (shadow);
-			// Destroy (gameObject);
-
-			// recycle gameobjects
-			map.monsters.Add (gameObject);
+			gameObject.transform.SetParent (map.poolHolder);
 			gameObject.SetActive (false);
 		}
 	}

@@ -43,6 +43,7 @@ public class MapGenerator : MonoBehaviour {
 	private List<Map> maps = new List<Map>();
 	private Transform mapHolder;
 	private Transform subMapHolder;
+	public Transform poolHolder;
 	private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
 
 	private bool noMonster;
@@ -60,51 +61,6 @@ public class MapGenerator : MonoBehaviour {
 	{
 		map_width = width * size;
 		map_height = height * size;
-
-		// tree pool
-		if (trees.Count <= 0)
-		{
-			int objectCount = 30;
-			GameObject tileChoice;
-			GameObject tile;
-			for (int i = 0; i < objectCount; i++)
-			{
-				tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
-				tile = Instantiate (tileChoice);
-				tile.SetActive (false);
-				trees.Add (tile);
-			}
-		}
-
-		// strength pool
-		if (strengths.Count <= 0)
-		{
-			int objectCount = 10;
-			GameObject tileChoice;
-			GameObject tile;
-			for (int i = 0; i < objectCount; i++)
-			{
-				tileChoice = strengthTiles[Random.Range (0, strengthTiles.Length)];
-				tile = Instantiate (tileChoice);
-				tile.SetActive (false);
-				strengths.Add (tile);
-			}
-		}
-
-		// monster pool
-		if (monsters.Count <= 0)
-		{
-			int objectCount = 10;
-			GameObject tileChoice;
-			GameObject tile;
-			for (int i = 0; i < objectCount; i++)
-			{
-				tileChoice = monsterTiles[Random.Range (0, monsterTiles.Length)];
-				tile = Instantiate (tileChoice);
-				tile.SetActive (false);
-				monsters.Add (tile);
-			}
-		}
 	}
 
 	public void RemoveMap (float offset_x, float offset_y)
@@ -120,7 +76,7 @@ public class MapGenerator : MonoBehaviour {
 			return;
 		}
 
-		Debug.Log (trees.Count + ", " + strengths.Count + ", " + monsters.Count);
+		// Debug.Log (trees.Count + ", " + strengths.Count + ", " + monsters.Count);
 
 		if (mapHolder == null)
 		{
@@ -401,6 +357,65 @@ public class MapGenerator : MonoBehaviour {
 		noWisdomTree = true;
 		noSpiritTree = true;
 		maps.Clear ();
+		trees.Clear ();
+		strengths.Clear ();
+		monsters.Clear ();
+
+		if (poolHolder == null)
+		{
+			GameObject poolObject = new GameObject ("Pool");
+			poolHolder = poolObject.transform;
+		}
+
+		// tree pool
+		if (trees.Count <= 0)
+		{
+			int objectCount = 30;
+			GameObject tileChoice;
+			GameObject tile;
+			for (int i = 0; i < objectCount; i++)
+			{
+				tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
+				tile = Instantiate (tileChoice);
+				tile.SetActive (false);
+				tile.transform.SetParent (poolHolder);
+				trees.Add (tile);
+			}
+		}
+
+		// strength pool
+		if (strengths.Count <= 0)
+		{
+			int objectCount = 10;
+			GameObject tileChoice;
+			GameObject tile;
+			for (int i = 0; i < objectCount; i++)
+			{
+				tileChoice = strengthTiles[Random.Range (0, strengthTiles.Length)];
+				tile = Instantiate (tileChoice);
+				tile.SetActive (false);
+				tile.transform.SetParent (poolHolder);
+				strengths.Add (tile);
+			}
+		}
+
+		// monster pool
+		if (monsters.Count <= 0)
+		{
+			int objectCount = 10;
+			GameObject tileChoice;
+			GameObject tile;
+			for (int i = 0; i < objectCount; i++)
+			{
+				tileChoice = monsterTiles[Random.Range (0, monsterTiles.Length)];
+				tile = Instantiate (tileChoice);
+				tile.SetActive (false);
+				tile.transform.SetParent (poolHolder);
+				monsters.Add (tile);
+			}
+		}
+
+		GenerateMap (0, 0);
 	}
 
 	public void SetNoMonster (bool _noMonster)
