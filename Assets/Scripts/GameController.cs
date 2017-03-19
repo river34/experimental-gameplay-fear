@@ -17,7 +17,7 @@ public class States {
 public class GameController : MonoBehaviour {
 
 	public static GameController instance = null;
-	public CameraController camera;
+	public CameraController cameraController;
 	public GameObject player;
 
 	[HideInInspector]
@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour {
 	public float playerFear;
 	[HideInInspector]
 	public int playerComplete;
-	[HideInInspector]
+	// [HideInInspector]
 	public int level;
 
 	// UI
@@ -77,6 +77,8 @@ public class GameController : MonoBehaviour {
 
 	// time control
 	private float time;
+	private string nextQuest = "More Courage";
+	private int nextLevel = 4;
 
 	void Awake ()
 	{
@@ -158,6 +160,7 @@ public class GameController : MonoBehaviour {
 			if (Time.time - time > 0.5f && Input.GetKey ("p"))
 			{
 				EndIntro ();
+				nextLevel ++;
 				time = Time.time;
 				state = States.END;
 			}
@@ -169,6 +172,7 @@ public class GameController : MonoBehaviour {
 			fails[1] = "A Kumu will never give up and neither shall you";
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = fails [Random.Range (0, fails.Length)];
 			UI_End.transform.Find ("Restart").GetComponent<Text>().text = "Space to try again";
+			nextLevel = Mathf.Max (1, nextLevel - 1);
 			time = Time.time;
 			state = States.END;
 		}
@@ -178,7 +182,7 @@ public class GameController : MonoBehaviour {
 
 			if (Time.time - time > 1 && Input.GetKey ("space"))
 			{
-				InitGame ();
+				InitGame (nextQuest, nextLevel);
 				time = Time.time;
 				state = States.QUEST;
 			}
@@ -222,7 +226,7 @@ public class GameController : MonoBehaviour {
 		soundManager.StopBackground ();
 		UI_Block.SetActive (false);
 		UI_End.SetActive (true);
-		camera.enabled = false;
+		cameraController.enabled = false;
 		questManager.enabled = false;
 	}
 
@@ -234,8 +238,14 @@ public class GameController : MonoBehaviour {
 
     static private void OnSceneLoaded (Scene arg0, LoadSceneMode arg1)
     {
-        instance.InitGame ();
+        // instance.InitGame ();
     }
+
+	void InitGame (string questName, int questLevel)
+	{
+		InitGame ();
+		questManager.CompleteQuest (questName, questLevel);
+	}
 
 	void InitGame ()
 	{
@@ -250,9 +260,9 @@ public class GameController : MonoBehaviour {
 		if (playerObject == null)
 			playerObject = Instantiate (player);
 
-		camera.player = playerObject.transform;
-		camera.InitCamera ();
-		camera.enabled = true;
+		cameraController.player = playerObject.transform;
+		cameraController.InitCamera ();
+		cameraController.enabled = true;
 
 		if (mapObject == null)
 			mapObject = new GameObject ("Map");

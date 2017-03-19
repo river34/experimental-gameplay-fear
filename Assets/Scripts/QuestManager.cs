@@ -237,7 +237,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"Ghosts are everywhere.  There is no way to get rid of them...",
 		"Monster", 5, false, nextName,
-		-1, -1, 0, 500,
+		-1, -1, 0, 600,
 		true, false, false, false, true);
 		quests.Add (quest);
 
@@ -340,11 +340,56 @@ public class QuestManager : MonoBehaviour {
 			{
 				UI_Quest.SetActive (true);
 				quest.isOpen = true;
+				quest.objects.Clear ();
 				questName.text = quest.name;
 				questText.text = quest.text;
 				StartQuest (quest.id);
 				break;
 			}
+		}
+	}
+
+	public void CompleteQuest (string completeName, int completeLevel)
+	{
+		// Debug.Log ("Force Complete " + completeName);
+		Quest completeQuest = FindByName (completeName);
+
+		if (completeQuest == null)
+			return;
+
+		int id = completeQuest.id;
+
+		quests[id].isFinished = true;
+		quests[id].finishTime = Time.deltaTime;
+		GameController.instance.level += completeLevel;
+
+		foreach (Quest quest in quests)
+		{
+			if (quest.isOpen)
+			{
+				quest.isOpen = false;
+			}
+		}
+
+		if (quests[id].next.Length > 0)
+		{
+			foreach (string name in quests[id].next)
+			{
+				quest = FindByName (name);
+				if (quest == null)
+				{
+					return;
+				}
+				quest.isOpen = true;
+				quest.objects.Clear ();
+				questName.text = quest.name;
+				questText.text = quest.text;
+				StartQuest (quest.id);
+			}
+		}
+		else
+		{
+			GameController.instance.GameComplete ();
 		}
 	}
 
@@ -383,6 +428,7 @@ public class QuestManager : MonoBehaviour {
 					return;
 				}
 				quest.isOpen = true;
+				quest.objects.Clear ();
 				questName.text = quest.name;
 				questText.text = quest.text;
 				StartQuest (quest.id);

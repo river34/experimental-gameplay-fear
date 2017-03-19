@@ -84,18 +84,18 @@ public class MapGenerator : MonoBehaviour {
 		}
 
 		GameObject subMapObject = new GameObject ("SubMap");
-		subMapObject.layer = 9;
+		// subMapObject.layer = 9;
 		subMapObject.AddComponent <MapController> ();
 		subMapObject.transform.SetParent (mapHolder);
 		subMapHolder = subMapObject.transform;
-		subMapHolder.position = new Vector3 (offset_x, 0 , offset_y);
+		subMapHolder.position = new Vector3 (offset_x, offset_y, 0);
 
 		gridPositions.Clear ();
 		for (int x = 0; x < width; x++)
 		{
 			for (int y = 0; y < height; y++)
 			{
-				gridPositions.Add (new Vector3(x, 0f, y));
+				gridPositions.Add (new Vector3(x, y, 0f));
 			}
 		}
 
@@ -121,8 +121,8 @@ public class MapGenerator : MonoBehaviour {
 		// lands
 		tileChoice = landTile[Random.Range (0, landTile.Length)];
 		tile = Instantiate (tileChoice) as GameObject;
-		tile.transform.position = new Vector3 (-map_width/2 + offset_x, 0f, -map_height/2 + offset_y);
-		tile.transform.localScale = new Vector3 (map_width, 1, map_height);
+		tile.transform.position = new Vector3 (-map_width/2 + offset_x, -map_height/2 + offset_y, 0f);
+		tile.transform.localScale = new Vector3 (map_width, map_height, 1);
 		tile.transform.SetParent (subMapHolder);
 
 		for (int x = 0; x < width; x++)
@@ -143,9 +143,9 @@ public class MapGenerator : MonoBehaviour {
 						tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
 						tile = Instantiate (tileChoice) as GameObject;
 					}
-					tile.transform.position = new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y);
+					tile.transform.position = new Vector3 (-map_width/2 + x * size + offset_x, -map_height/2 + y * size + offset_y, 0f);
 					tile.transform.SetParent (subMapHolder);
-					gridPositions.Remove (new Vector3 (x, 0f, y));
+					gridPositions.Remove (new Vector3 (x, y, 0f));
 				}
 			}
 		}
@@ -162,7 +162,7 @@ public class MapGenerator : MonoBehaviour {
 
 		if (!noStrength)
 		{
-			int strengthCount = Mathf.Max (10, 20 - GameController.instance.level);
+			int strengthCount = Mathf.Max (15, 20 - (int) Mathf.Log (GameController.instance.level));
 			LayoutObjectAtRandom (strengthTiles, strengthCount - 5, strengthCount, offset_x, offset_y, "Strength");
 		}
 
@@ -276,8 +276,8 @@ public class MapGenerator : MonoBehaviour {
 			{
 				randomPosition = RandomPosition ();
 				randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
-				randomPosition.y = 0f;
-				randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+				randomPosition.y = -map_height/2 + randomPosition.y * size + offset_y;
+				randomPosition.z = 0f;
 				if (strengths.Count > 0)
 				{
 					tile = strengths[0];
@@ -299,8 +299,8 @@ public class MapGenerator : MonoBehaviour {
 			{
 				randomPosition = RandomPosition ();
 				randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
-				randomPosition.y = 0f;
-				randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+				randomPosition.y = -map_height/2 + randomPosition.y * size + offset_y;
+				randomPosition.z = 0f;
 				if (monsters.Count > 0)
 				{
 					tile = monsters[0];
@@ -331,8 +331,8 @@ public class MapGenerator : MonoBehaviour {
 		{
 			randomPosition = RandomPosition ();
 			randomPosition.x = -map_width/2 + randomPosition.x * size + offset_x;
-			randomPosition.y = 0f;
-			randomPosition.z = -map_height/2 + randomPosition.z * size + offset_y;
+			randomPosition.y = -map_height/2 + randomPosition.y * size + offset_y;
+			randomPosition.z = 0f;
 
 			tileChoice = tileArray[Random.Range (0, tileArray.Length)];
 			tile = Instantiate (tileChoice, randomPosition, Quaternion.identity);

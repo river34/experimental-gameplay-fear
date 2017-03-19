@@ -6,8 +6,8 @@ public class CameraController : MonoBehaviour {
 
 	public Transform player;
 	private Vector3 offset;
-	private Vector3 original_position = new Vector3 (0, 8, -7);
-	private Vector3 origianl_rotation = new Vector3 (45, 0, 0);
+	private Vector3 original_position = new Vector3 (0, -5, -6);
+	private Vector3 origianl_rotation = new Vector3 (-45, 0, 0);
 
 	void Update ()
 	{

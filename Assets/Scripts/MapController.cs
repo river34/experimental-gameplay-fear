@@ -6,15 +6,15 @@ public class MapController : MonoBehaviour {
 
 	private MapGenerator map;
 	private Transform player;
-	private BoxCollider boxCollider;
+	// private BoxCollider2D boxCollider;
 	private float maxDistance = 900f;
 
 	void Start ()
 	{
-		boxCollider = gameObject.AddComponent <BoxCollider> ();
-		boxCollider.isTrigger = true;
+		// boxCollider = gameObject.AddComponent <BoxCollider2D> ();
+		// boxCollider.isTrigger = true;
 		map = GameObject.FindGameObjectWithTag ("GameController").GetComponent <MapGenerator> ();
-		boxCollider.size = new Vector3 (map.map_width, 1, map.map_height);
+		// boxCollider.size = new Vector2 (map.map_width, map.map_height);
 	}
 
 	void Update ()

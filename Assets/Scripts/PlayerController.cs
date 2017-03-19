@@ -66,9 +66,13 @@ public class PlayerController : MonoBehaviour {
 	private RectTransform UI_Arrow;
 	private List<string> navList = new List<string>();
 	private Vector2 thisViewpoint;
+	private Vector3 thisViewpoint3D;
+	private RectTransform canvasRect;
+	private float canvasWidth;
+	private float canvasHeight;
 
 	private float reverseMul = 0.001f;
-	int mask = (1 << 9);
+	// int mask = (1 << 9);
 
 	void Awake ()
 	{
@@ -80,6 +84,9 @@ public class PlayerController : MonoBehaviour {
 		questManager = GameController.instance.questManager;
 		UI_Nav = GameController.instance.UI_Nav;
 		UI_Arrow = UI_Nav.transform.Find ("Arrow").gameObject.GetComponent <RectTransform> ();
+		canvasRect = UI_Nav.GetComponent <RectTransform> ();
+		canvasWidth = canvasRect.rect.width;
+		canvasHeight = canvasRect.rect.height;
 		navList.Add ("WisdomTree");
 		navList.Add ("Courage");
 		navList.Add ("SpiritTree");
@@ -92,6 +99,7 @@ public class PlayerController : MonoBehaviour {
 		last_position = transform.position;
 		render.color = Color.Lerp (halfClear, Color.yellow, strength * reverseMul);
 		thisViewpoint = Camera.main.WorldToViewportPoint (transform.position);
+		thisViewpoint3D = new Vector3 (thisViewpoint.x * canvasWidth, thisViewpoint.y * canvasHeight, 0);
 	}
 
 	// Update is called once per frame
@@ -118,7 +126,7 @@ public class PlayerController : MonoBehaviour {
 			{
 				is_left = false;
 			}
-			if (transform.position.z >= last_position.z)
+			if (transform.position.y >= last_position.y)
 			{
 				is_up = true;
 				// animator.SetBool ("IsUp", true);
@@ -161,7 +169,7 @@ public class PlayerController : MonoBehaviour {
 	// reach border of the current map
 	void ReachBoarder ()	// up - 0, right - 1, bottom - 2, left - 3, none - -1
 	{
-		if (transform.position.z > map.up - maxView)
+		if (transform.position.y > map.up - maxView)
 		{
 			map_up = true;
 		}
@@ -177,7 +185,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			map_right = false;
 		}
-		if (transform.position.z < map.bottom + 4.5f)
+		if (transform.position.y < map.bottom + 4.5f)
 		{
 			map_bottom = true;
 		}
@@ -210,11 +218,11 @@ public class PlayerController : MonoBehaviour {
 
 		if (Input.GetKey("w") || Input.GetKey("up"))
 		{
-			movement += Vector3.forward;
+			movement += Vector3.up;
 		}
 		else if (Input.GetKey("s") || Input.GetKey("down"))
 		{
-			movement += Vector3.back;
+			movement += Vector3.down;
 		}
 
 		if (Input.GetKey("a") || Input.GetKey("left"))
@@ -268,14 +276,20 @@ public class PlayerController : MonoBehaviour {
 
 		if (Input.GetMouseButton (0))
 		{
-			Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
-            RaycastHit floorHit;
-            if (Physics.Raycast (camRay, out floorHit, 100, mask))
-            {
-                Vector3 position = floorHit.point - transform.position;
-                position.y = 0f;
-				movement = position.normalized;
-            }
+			// Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
+            // RaycastHit floorHit;
+            // if (Physics.Raycast (camRay, out floorHit, 100, mask))
+            // {
+            //     Vector3 position = floorHit.point - transform.position;
+            //     position.z = 0f;
+			// 	movement = position.normalized;
+            // }
+
+			// 2D for webgl
+			Vector3 screenPoint = Input.mousePosition;
+			movement = screenPoint - thisViewpoint3D;
+			// Debug.Log (screenPoint + ", " + thisViewpoint3D);
+			movement = movement.normalized;
 		}
 
 		transform.position += movement * speed * Time.deltaTime;
@@ -285,7 +299,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (map == null)
 		{
-			map = GameController.instance.FindMap (transform.position.x, transform.position.z);
+			map = GameController.instance.FindMap (transform.position.x, transform.position.y);
 		}
 
 		if (map == null)
@@ -329,10 +343,10 @@ public class PlayerController : MonoBehaviour {
 			GameController.instance.GenerateMap (map.left - GameController.instance.map_width/2, map.up + GameController.instance.map_height/2);
 		}
 
-		if (transform.position.z > map.up || transform.position.z < map.bottom ||
+		if (transform.position.y > map.up || transform.position.y < map.bottom ||
 			transform.position.x > map.right || transform.position.x < map.left)
 		{
-			map = GameController.instance.FindMap (transform.position.x, transform.position.z);
+			map = GameController.instance.FindMap (transform.position.x, transform.position.y);
 		}
 	}
 
@@ -425,16 +439,15 @@ public class PlayerController : MonoBehaviour {
 	public void LossStrength (float loss)
 	{
 		strength -= loss;
-
-		if (strength < min_strength)
+		if (strength <= min_strength)
 		{
-			strength = min_strength;
+			GameController.instance.GameOver ();
 		}
+		// CheckIfGameOver ();
 
 		render.color = Color.Lerp (halfClear, Color.yellow, strength * reverseMul);
 
 		GameController.instance.playerStrength = strength;
-		CheckIfGameOver ();
 	}
 
 	public void GainCourage (float gain)
@@ -470,7 +483,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter (Collider other)
+	void OnTriggerEnter2D (Collider2D other)
 	{
 		if (other.gameObject.CompareTag ("Strength"))
 		{
@@ -514,7 +527,7 @@ public class PlayerController : MonoBehaviour {
 				if (quest.tag != null && other.gameObject.CompareTag (quest.tag))
 				{
 					questManager.quests[quest.id].objects.Add (other.gameObject);
-					questManager.CheckForComplete (quest.id, this);
+					// Debug.Log (quest.id + " " + questManager.quests[quest.id].objects.Count);
 					// bool completeNew = questManager.CheckForComplete (quest.id, this);
 					// if (completeNew)
 					// {
@@ -523,11 +536,12 @@ public class PlayerController : MonoBehaviour {
 					// 	completes.Add (completeObject);
 					// }
 				}
+				questManager.CheckForComplete (quest.id, this);
 			}
 		}
 	}
 
-	void OnTriggerExit (Collider other)
+	void OnTriggerExit2D (Collider2D other)
 	{
 		if (other.gameObject.CompareTag ("Monster"))
 		{

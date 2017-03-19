@@ -2,9 +2,7 @@
 - possible tablet support
 - more playtest
 - audio track (Colin)
-- voice over
-- browser freezing problem after "ghosts" quest - memory problem?
-- browser lagging problem
+- voice over (Colin)
 
 # Done
 - created main mechanism (first iteration)
@@ -25,6 +23,8 @@
 - removed warnings
 - added mask layer
 - fixed keyboard input problems
+- fixed browser freezing problem after "ghosts" quest - webgl strip
+- optimised for webgl - removed all 3D physics
 
 # Playtest
 - 3.15 Xuesong
