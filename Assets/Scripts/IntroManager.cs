@@ -32,18 +32,17 @@ public class IntroManager : MonoBehaviour {
 
 		if (tag == "Intro")
 		{
-			lines.Add ("Ima, it is time now. you are no longer a child.");
+			lines.Add ("Ima, it is time now. You are no longer a child.");
 			lines.Add ("You need to prove that you are a true Kumu.");
 			lines.Add ("Under the stars, you will go to the Fear Forest.");
 			lines.Add ("You will discover the secret of courage and fear.");
-			lines.Add ("Then, and only then, you will become a Kumu.");
+			lines.Add ("Then, and only then, will you become a Kumu.");
 		}
 		else if (tag == "Complete")
 		{
 			lines.Add ("Ima, you are a true Kumu now.");
-			lines.Add ("The Fear Forest has witnessed your fear and courage.");
+			lines.Add ("The Fear Forest has witnessed your courage.");
 			lines.Add ("You already knew all the secrets a Kumu needs to know.");
-			lines.Add ("Now, you need to bring the knowledge back to your tribe.");
 			lines.Add ("It is time to go home.");
 		}
 	}

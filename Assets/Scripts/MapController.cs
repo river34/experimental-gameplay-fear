@@ -6,13 +6,13 @@ public class MapController : MonoBehaviour {
 
 	private MapGenerator map;
 	private Transform player;
-	private BoxCollider collider;
+	private BoxCollider boxCollider;
 	private float maxDistance = 1600f;
 
 	void Start ()
 	{
-		collider = gameObject.AddComponent <BoxCollider> ();
-		collider.isTrigger = true;
+		boxCollider = gameObject.AddComponent <BoxCollider> ();
+		boxCollider.isTrigger = true;
 	}
 
 	void Update ()
@@ -27,7 +27,7 @@ public class MapController : MonoBehaviour {
 		if (map == null)
 		{
 			map = GameObject.FindGameObjectWithTag ("GameController").GetComponent <MapGenerator> ();;
-			collider.size = new Vector3 (map.map_width, 1, map.map_height);
+			boxCollider.size = new Vector3 (map.map_width, 1, map.map_height);
 		}
 
 		Vector3 distance = player.position - transform.position;
@@ -35,6 +35,7 @@ public class MapController : MonoBehaviour {
 		if (distance.sqrMagnitude > maxDistance)
 		{
 			map.RemoveMap (transform.position.x, transform.position.z);
+			// gameObject.SetActive (false);
 			Destroy (gameObject);
 		}
 	}

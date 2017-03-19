@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour {
 	public float strength;
 	private int min_strength = 0;
 	private int max_strength = 1000;
-	private int strengthGain = 250;
+	private int strengthGain = 350;
 	private int strengthLoss = 10;
 
 	// fear
@@ -35,14 +35,14 @@ public class PlayerController : MonoBehaviour {
 
 	// input
 	public float speed;
-	public float jump_speed;
+	// public float jump_speed;
 	public float walk_speed;
 	public float run_speed;
-	private float up_speed = 0;
-	private float down_speed = 0;
-	private float gravity = 10f;
+	// private float up_speed = 0;
+	// private float down_speed = 0;
+	// private float gravity = 10f;
 	private bool is_moving;
-	private bool is_running;
+	// private bool is_running;
 	private bool is_left;
 	private bool is_up;
 	private List<GameObject> monsters = new List<GameObject>();
@@ -58,17 +58,17 @@ public class PlayerController : MonoBehaviour {
 	private Color halfClear;
 
 	// completes
-	public GameObject complete;
-	private List<GameObject> completes = new List<GameObject>();
+	// public GameObject complete;
+	// private List<GameObject> completes = new List<GameObject>();
 
 	// navigation
 	private GameObject UI_Nav;
 	private RectTransform UI_Arrow;
-	private RectTransform canvasRect;
 	private List<string> navList = new List<string>();
 	private Vector2 thisViewpoint;
 
 	private float reverseMul = 0.001f;
+	int mask = (1 << 9);
 
 	void Awake ()
 	{
@@ -80,7 +80,6 @@ public class PlayerController : MonoBehaviour {
 		questManager = GameController.instance.questManager;
 		UI_Nav = GameController.instance.UI_Nav;
 		UI_Arrow = UI_Nav.transform.Find ("Arrow").gameObject.GetComponent <RectTransform> ();
-		canvasRect = UI_Nav.GetComponent <RectTransform> ();
 		navList.Add ("WisdomTree");
 		navList.Add ("Courage");
 		navList.Add ("SpiritTree");
@@ -110,6 +109,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			is_moving = true;
 			animator.SetBool ("IsWalking", true);
+			animator.SetBool ("IsUp", true);
 			if (transform.position.x <= last_position.x)
 			{
 				is_left = true;
@@ -121,10 +121,12 @@ public class PlayerController : MonoBehaviour {
 			if (transform.position.z >= last_position.z)
 			{
 				is_up = true;
+				// animator.SetBool ("IsUp", true);
 			}
 			else
 			{
 				is_up = false;
+				// animator.SetBool ("IsUp", false);
 			}
 		}
 		else
@@ -196,32 +198,32 @@ public class PlayerController : MonoBehaviour {
 	void UpdateInput ()
 	{
 		speed = walk_speed;
-		is_running = false;
+		// is_running = false;
 		Vector3 movement = Vector3.zero;
 
 		// keyboard input
 		if (Input.GetKey("left shift") || Input.GetKey("right shift") || Input.GetKey("space"))
 		{
 			speed = run_speed;
-			is_running = true;
+			// is_running = true;
 		}
 
 		if (Input.GetKey("w") || Input.GetKey("up"))
 		{
-			movement = Vector3.forward;
+			movement += Vector3.forward;
 		}
 		else if (Input.GetKey("s") || Input.GetKey("down"))
 		{
-			movement = Vector3.back;
+			movement += Vector3.back;
 		}
 
 		if (Input.GetKey("a") || Input.GetKey("left"))
 		{
-			movement = Vector3.left;
+			movement += Vector3.left;
 		}
 		else if (Input.GetKey("d") || Input.GetKey("right"))
 		{
-			movement = Vector3.right;
+			movement += Vector3.right;
 		}
 
 		/*
@@ -261,14 +263,14 @@ public class PlayerController : MonoBehaviour {
 		if (Input.GetMouseButton (1))
 		{
 			speed = run_speed;
-			is_running = true;
+			// is_running = true;
 		}
 
 		if (Input.GetMouseButton (0))
 		{
 			Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
             RaycastHit floorHit;
-            if (Physics.Raycast (camRay, out floorHit, 100))
+            if (Physics.Raycast (camRay, out floorHit, 100, mask))
             {
                 Vector3 position = floorHit.point - transform.position;
                 position.y = 0f;
@@ -360,15 +362,15 @@ public class PlayerController : MonoBehaviour {
 		{
 			if (monsters.Count > 0 && fear > high_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count * monsters.Count + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * monsters.Count * monsters.Count * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > mid_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * monsters.Count * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > low_fear)
 			{
-				LossStrength (strengthLoss * (Mathf.Log (monsters.Count) + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * Mathf.Log (monsters.Count) * Time.deltaTime);
 			}
 		}
 
@@ -512,7 +514,8 @@ public class PlayerController : MonoBehaviour {
 				if (quest.tag != null && other.gameObject.CompareTag (quest.tag))
 				{
 					questManager.quests[quest.id].objects.Add (other.gameObject);
-					bool completeNew = questManager.CheckForComplete (quest.id, this);
+					questManager.CheckForComplete (quest.id, this);
+					// bool completeNew = questManager.CheckForComplete (quest.id, this);
 					// if (completeNew)
 					// {
 					// 	GameObject completeObject = Instantiate (complete, transform, false);
@@ -600,18 +603,6 @@ public class PlayerController : MonoBehaviour {
 					UI_Nav.SetActive (true);
 
 				Vector2 targetViewpoint = Camera.main.WorldToViewportPoint (nearest.transform.position);
-				Vector2 thisViewpoint = Camera.main.WorldToViewportPoint (transform.position);
-				// Vector2 screenPosition = new Vector2 (
-				// 	((targetViewpoint.x * canvasRect.sizeDelta.x) - (canvasRect.sizeDelta.x * 0.5f)),
-				// 	((targetViewpoint.y * canvasRect.sizeDelta.y) - (canvasRect.sizeDelta.y * 0.5f)));
-				//
-				// Vector2 screenPosition = new Vector2 (
-				// 	(targetViewpoint.x * canvasRect.sizeDelta.x / 2),
-				// 	(targetViewpoint.y * canvasRect.sizeDelta.y / 2 ));
-				//
-				// Debug.Log (nearest.name + " : " + targetViewpoint + " " + screenPosition);
-				// UI_Arrow.localPosition = screenPosition;
-
 				float angle = Mathf.Atan2 (targetViewpoint.y - thisViewpoint.y, targetViewpoint.x - thisViewpoint.x) * Mathf.Rad2Deg;
 				// Debug.Log (nearest.name + " : " + targetViewpoint + " " + thisViewpoint + " " + angle);
 				// UI_Arrow.localRotation = Quaternion.Slerp (UI_Arrow.localRotation, Quaternion.AngleAxis (angle, Vector3.forward), Time.deltaTime * 2.0f);

@@ -9,7 +9,7 @@ public class MonsterController : MonoBehaviour {
 	private Transform target;
 	private PlayerController player;
 	private bool FindPlayer;
-	private bool lastFindPlayer;
+	// private bool lastFindPlayer;
 	private float farDistance;
 	private float closeDistance;
 	private float angle;
@@ -20,7 +20,7 @@ public class MonsterController : MonoBehaviour {
 	private float scaleSpeed = 0.3f;
 	private float radSpeed = 0.1f;
 	private float maxRad = 1f;
-	private Color highClear = Color.clear * 0.75f;
+	// private Color highClear = Color.clear * 0.75f;
 	private Color halfClear = Color.clear * 0.5f;
 	private Color lowClear = Color.clear * 0.25f;
 	private GameObject shadow;
@@ -36,13 +36,6 @@ public class MonsterController : MonoBehaviour {
 
 		// shadow
 		mapHolder = GameObject.Find ("Map").transform;
-		shadow = GameObject.CreatePrimitive (PrimitiveType.Sphere);
-		shadow.tag = "Shadow";
-		shadow.GetComponent <Renderer> ().enabled = false;
-		shadow.GetComponent <SphereCollider> ().isTrigger = true;
-		shadow.GetComponent <SphereCollider> ().radius = 6f;
-		shadow.transform.SetParent (mapHolder);
-		shadow.layer = LayerMask.NameToLayer ("Ignore Raycast");
 	}
 
 	void Update () {
@@ -53,6 +46,17 @@ public class MonsterController : MonoBehaviour {
 
 		if (sqrLen < farDistance)
 		{
+			if (shadow == null)
+			{
+				shadow = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+				shadow.tag = "Shadow";
+				shadow.GetComponent <Renderer> ().enabled = false;
+				shadow.GetComponent <SphereCollider> ().isTrigger = true;
+				shadow.GetComponent <SphereCollider> ().radius = 6f;
+				shadow.transform.SetParent (mapHolder);
+				shadow.layer = LayerMask.NameToLayer ("Ignore Raycast");
+			}
+
 			Vector3 targetPosition = target.position;
 			targetPosition.y = transform.position.y;
 
@@ -113,12 +117,15 @@ public class MonsterController : MonoBehaviour {
 			}
 		}
 
-		shadow.transform.position = transform.position;
+		if (shadow != null)
+		{
+			shadow.transform.position = transform.position;
+		}
 	}
 
 	void LateUpdate ()
 	{
-		lastFindPlayer = FindPlayer;
+		// lastFindPlayer = FindPlayer;
 
 		if (transform.localScale.x < 0.1)
 		{

@@ -52,10 +52,16 @@ public class MapGenerator : MonoBehaviour {
 	private bool noWisdomTree;
 	private bool noSpiritTree;
 
+	void Awake ()
+	{
+		map_width = width * size;
+		map_height = height * size;
+	}
 
 	public void RemoveMap (float offset_x, float offset_y)
 	{
-		maps.Remove (FindMap (offset_x, offset_y));
+		Map map = FindMap (offset_x, offset_y);
+		maps.Remove (map);
 	}
 
 	public void GenerateMap (float offset_x, float offset_y)
@@ -65,15 +71,13 @@ public class MapGenerator : MonoBehaviour {
 			return;
 		}
 
-		map_width = width * size;
-		map_height = height * size;
 		if (mapHolder == null)
 		{
 			mapHolder = GameObject.Find ("Map").transform;
 		}
 
 		GameObject subMapObject = new GameObject ("SubMap");
-		subMapObject.tag = "Floor";
+		subMapObject.layer = 9;
 		subMapObject.AddComponent <MapController> ();
 		subMapObject.transform.SetParent (mapHolder);
 		subMapHolder = subMapObject.transform;
@@ -108,15 +112,18 @@ public class MapGenerator : MonoBehaviour {
 		{
 			for (int y = 0; y < height; y++)
 			{
+				GameObject tile;
 				GameObject tileChoice;
 				tileChoice = landTile[Random.Range (0, landTile.Length)];
-				GameObject tile = Instantiate (tileChoice, new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y), Quaternion.identity) as GameObject;
+				tile = Instantiate (tileChoice) as GameObject;
+				tile.transform.position = new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y);
 				tile.transform.SetParent (subMapHolder);
 
 				if (map.grid[x,y] == 2)
 				{
 					tileChoice = treeTiles[Random.Range (0, treeTiles.Length)];
-					tile = Instantiate (tileChoice, new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y), Quaternion.identity) as GameObject;
+					tile = Instantiate (tileChoice) as GameObject;
+					tile.transform.position = new Vector3 (-map_width/2 + x * size + offset_x, 0f, -map_height/2 + y * size + offset_y);
 					tile.transform.SetParent (subMapHolder);
 					gridPositions.Remove (new Vector3 (x, 0f, y));
 				}
@@ -138,8 +145,8 @@ public class MapGenerator : MonoBehaviour {
 		if (!noStrength)
 		{
 			// LayoutObjectAtRandom (strengthTiles, 10, 20, offset_x, offset_y);
-			int strengthCount = Mathf.Max (20, 25 - (int) Mathf.Log (GameController.instance.level));
-			weirdaLayoutObjectAroundLocationsAtRandom (strengthTiles, strengthCount - 10, strengthCount, offset_x, offset_y, centers);
+			int strengthCount = Mathf.Max (10, 20 - GameController.instance.level);
+			weirdaLayoutObjectAroundLocationsAtRandom (strengthTiles, strengthCount - 5, strengthCount, offset_x, offset_y, centers);
 		}
 
 		if (!noCourage)

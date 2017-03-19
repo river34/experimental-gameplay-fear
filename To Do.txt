@@ -2,7 +2,6 @@
 - possible tablet support
 - more playtest
 - audio track (Colin)
-- refine story lines
 - voice over
 
 # Done
@@ -19,6 +18,11 @@
 - removed yellow dots, or find another use of it
 - added a navigation system
 - reconsidered the quests to give more info - multiple branches
+- refined story lines
+- fixed bugs in quest system
+- removed warnings
+- added mask layer
+- fixed keyboard input problems
 
 # Playtest
 - 3.15 Xuesong

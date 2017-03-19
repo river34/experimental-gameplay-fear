@@ -53,7 +53,7 @@ public class GameController : MonoBehaviour {
 	private GameObject playerObject;
 	private GameObject mapObject;
 	private MapGenerator mapGenerator;
-	private bool doingSetup;
+	// private bool doingSetup;
 	private float gameStartDelay = 0.5f;
 
 	// quest
@@ -248,7 +248,7 @@ public class GameController : MonoBehaviour {
 			state = States.QUEST;
 		}
 
-		doingSetup = true;
+		// doingSetup = true;
 
 		level = 1;
 
@@ -307,7 +307,7 @@ public class GameController : MonoBehaviour {
 		playerObject.GetComponent <PlayerController>().enabled = true;
 		UI_Block.SetActive (false);
 		UI_Game.SetActive (true);
-		doingSetup = false;
+		// doingSetup = false;
 	}
 
 	public void GenerateMap (float offset_x, float offset_y)
