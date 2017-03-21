@@ -252,6 +252,11 @@ public class MapGenerator : MonoBehaviour {
 	{
 		foreach (Map _map in maps)
 		{
+			if (_map.holder == null)
+			{
+				maps.Remove (_map);
+				return null;
+			}
 			if (x >= _map.left && x <= _map.right &&
 				y <= _map.up && y >= _map.bottom)
 			{

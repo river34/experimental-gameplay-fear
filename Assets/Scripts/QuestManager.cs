@@ -213,7 +213,7 @@ public class QuestManager : MonoBehaviour {
 		nextName[2] = "Everywhere 3";
 		quest = new Quest (quests.Count, thisName,
 		"More of them are coming...",
-		"Monster", 10, false, nextName,
+		"Monster", 8, false, nextName,
 		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
@@ -226,7 +226,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"Ghosts are everywhere.  There is no way to get rid of them...",
 		"Monster", 5, false, nextName,
-		0, 500, -1, -1,
+		0, 600, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
 
@@ -237,7 +237,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"Ghosts are everywhere.  There is no way to get rid of them...",
 		"Monster", 5, false, nextName,
-		-1, -1, 0, 600,
+		-1, -1, 0, 700,
 		true, false, false, false, true);
 		quests.Add (quest);
 
@@ -248,7 +248,7 @@ public class QuestManager : MonoBehaviour {
 		nextName[1] = "Solution 2";
 		quest = new Quest (quests.Count, thisName,
 		"Ghosts are everywhere.  There is no way to get rid of them...",
-		"Monster", 10, false, nextName,
+		"Monster", 8, false, nextName,
 		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
@@ -260,7 +260,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"There must be a way to deal with them.",
 		"Monster", 5, false, nextName,
-		-1, -1, 0, 300,
+		-1, -1, 0, 600,
 		true, false, false, false, true);
 		quests.Add (quest);
 
@@ -270,7 +270,7 @@ public class QuestManager : MonoBehaviour {
 		nextName[0] = "Closer";
 		quest = new Quest (quests.Count, thisName,
 		"There must be a way to deal with them.",
-		"Monster", 10, false, nextName,
+		"Monster", 8, false, nextName,
 		-1, -1, -1, -1,
 		true, false, false, false, true);
 		quests.Add (quest);
@@ -315,7 +315,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"Wisdom Tree:  A true Kumu shall not be afraid of Ghosts. \r\nThey are nothing more than a reflection of your own fear.",
 		"Monster", 5, false, nextName,
-		950, 1000, 0, 50,
+		900, 1000, 0, 100,
 		true, false, false, false, true);
 		quests.Add (quest);
 

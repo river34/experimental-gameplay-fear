@@ -153,7 +153,7 @@ public class GameController : MonoBehaviour {
 		else if (state == States.COMPLETE)
 		{
 			string[] completes = new string[1];
-			completes[0] = "May courgae always be with you";
+			completes[0] = "May courage always be with you";
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = completes [Random.Range (0, completes.Length)];
 			UI_End.transform.Find ("Restart").GetComponent<Text>().text = "Space to replay";
 

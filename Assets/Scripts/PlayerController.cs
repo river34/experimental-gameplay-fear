@@ -70,6 +70,8 @@ public class PlayerController : MonoBehaviour {
 	private RectTransform canvasRect;
 	private float canvasWidth;
 	private float canvasHeight;
+	// public GameObject foot;
+	// private LineRenderer line;
 
 	private float reverseMul = 0.001f;
 	// int mask = (1 << 9);
@@ -100,6 +102,10 @@ public class PlayerController : MonoBehaviour {
 		render.color = Color.Lerp (halfClear, Color.yellow, strength * reverseMul);
 		thisViewpoint = Camera.main.WorldToViewportPoint (transform.position);
 		thisViewpoint3D = new Vector3 (thisViewpoint.x * canvasWidth, thisViewpoint.y * canvasHeight, 0);
+
+		// line = foot.GetComponent <LineRenderer> ();
+		// line.SetVertexCount (2);
+		// line.useWorldSpace = false;
 	}
 
 	// Update is called once per frame
@@ -618,12 +624,21 @@ public class PlayerController : MonoBehaviour {
 
 				Vector2 targetViewpoint = Camera.main.WorldToViewportPoint (nearest.transform.position);
 				float angle = Mathf.Atan2 (targetViewpoint.y - thisViewpoint.y, targetViewpoint.x - thisViewpoint.x) * Mathf.Rad2Deg;
-				// Debug.Log (nearest.name + " : " + targetViewpoint + " " + thisViewpoint + " " + angle);
-				// UI_Arrow.localRotation = Quaternion.Slerp (UI_Arrow.localRotation, Quaternion.AngleAxis (angle, Vector3.forward), Time.deltaTime * 2.0f);
 				UI_Arrow.localRotation = Quaternion.AngleAxis (angle, Vector3.forward);
+
+				// footstep lead to the objects
+				// if (!foot.activeSelf)
+				// 	foot.SetActive (true);
+				// Vector3 Start = Vector3.zero;
+				// Vector3 End = nearest.transform.position - transform.position;
+				// line.SetPosition (0, Start);
+				// line.SetPosition (1, End);
+				// performce is too bad
 			}
 			else
 			{
+				// if (foot.activeSelf)
+				// 	foot.SetActive (false);
 				if (UI_Nav.activeSelf)
 					UI_Nav.SetActive (false);
 			}
