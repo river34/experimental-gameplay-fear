@@ -530,6 +530,22 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	void OnDisable ()
+	{
+		if (soundManager != null)
+		{
+			soundManager.StopPanic ();
+		}
+	}
+
+	void OnDestroy ()
+	{
+		if (soundManager != null)
+		{
+			soundManager.StopPanic ();
+		}
+	}
+
 	void OnTriggerEnter2D (Collider2D other)
 	{
 		if (other.gameObject.CompareTag ("Strength"))

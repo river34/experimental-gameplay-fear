@@ -45,8 +45,6 @@ public class IntroManager : MonoBehaviour {
 	{
 		text = UI_Intro.transform.Find ("Text").GetComponent <Text> ();
 
-		soundManager = GameController.instance.soundManager;
-
 		lines = new List<string> ();
 
 		startTime = -1;
@@ -131,6 +129,11 @@ public class IntroManager : MonoBehaviour {
 
 	void Update ()
 	{
+		if (soundManager == null)
+		{
+			soundManager = GameController.instance.soundManager;
+		}
+
 		if (startTime < 0)
 		{
 			return;

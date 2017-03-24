@@ -98,9 +98,9 @@ public class GameController : MonoBehaviour {
 		DontDestroyOnLoad (gameObject);
 
 		mapGenerator = GetComponent <MapGenerator>();
+		soundManager = GetComponent <SoundManager>();
 		questManager = GetComponent <QuestManager>();
 		introManeger = GetComponent <IntroManager>();
-		soundManager = GetComponent <SoundManager>();
 
 		UI_StrengthBar = UI_Strength.transform.Find ("Bar").gameObject.GetComponent<RectTransform>();
 		UI_CourageBar = UI_Courage.transform.Find ("Bar").gameObject.GetComponent<RectTransform>();
@@ -188,6 +188,7 @@ public class GameController : MonoBehaviour {
 
 			if (Time.time - time > 1 && Input.GetKey ("space"))
 			{
+				soundManager.PlayBackground (MUS_game);
 				InitGame (nextQuest, nextLevel);
 				time = Time.time;
 				state = States.QUEST;
@@ -213,6 +214,8 @@ public class GameController : MonoBehaviour {
 
 	public void GameOver ()
 	{
+		playerObject.GetComponent <PlayerController>().enabled = false;
+		mapGenerator.enabled = false;
 		soundManager.PlayBackground (MUS_outro);
 		time = Time.time;
 		state = States.FAIL;
@@ -220,6 +223,8 @@ public class GameController : MonoBehaviour {
 
 	public void GameComplete ()
 	{
+		playerObject.GetComponent <PlayerController>().enabled = false;
+		mapGenerator.enabled = false;
 		soundManager.PlayBackground (MUS_outro);
 		time = Time.time;
 		state = States.COMPLETE;

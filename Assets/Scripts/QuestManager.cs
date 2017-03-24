@@ -283,7 +283,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"Ghosts are everywhere.  What will Ima do?",
 		"Monster", 5, false, nextName,
-		801, 1000, 801, 1000,
+		601, 800, 801, 1000,
 		true, false, false, false, true,
 		6, VO_Everywhere);
 		quests.Add (quest);
@@ -319,7 +319,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"There must be a way to deal with them.",
 		"Monster", 5, false, nextName,
-		601, 800, 801, 1000,
+		801, 1000, 801, 1000,
 		true, false, false, false, true,
 		6, VO_Solution);
 		quests.Add (quest);
@@ -331,7 +331,7 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"What happens if Ima approaches the Ghosts?",
 		"Monster", 1, false, nextName,
-		801, 1000, 301, 600,
+		601, 800, 301, 600,
 		true, false, false, false, true,
 		6, VO_Closer);
 		quests.Add (quest);
