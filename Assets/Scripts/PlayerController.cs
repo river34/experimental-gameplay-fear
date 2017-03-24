@@ -16,18 +16,18 @@ public class PlayerController : MonoBehaviour {
 	public float strength;
 	private int min_strength = 0;
 	private int max_strength = 1000;
-	private int strengthGain = 350;
-	private int strengthLoss = 10;
+	private int strengthGain = 300;
+	private int strengthLoss = 5;
 
 	// fear
 	public float fear;
 	public int min_fear = 0;
-	public int low_fear = 300;
-	public int mid_fear = 600;
-	public int high_fear = 800;
-	private int max_fear = 1000;
-	private int fearGain = 10;
-	private int fearLoss = 10;
+	public int low_fear = 100;
+	public int mid_fear = 300;
+	public int high_fear = 600;
+	public int max_fear = 1000;
+	private int fearGain = 5;
+	private int fearLoss = 5;
 	private int courageGain = 100;
 
 	// position
@@ -76,6 +76,14 @@ public class PlayerController : MonoBehaviour {
 	private float reverseMul = 0.001f;
 	// int mask = (1 << 9);
 
+	// sound effects
+	private SoundManager soundManager;
+	public AudioClip[] footstep;
+	public AudioClip[] pickUpStrength;
+	public AudioClip[] pickUpCourage;
+	public AudioClip[] meetWisdom;
+	public AudioClip[] meetSpirit;
+
 	void Awake ()
 	{
 		sprite = transform.Find ("Sprite");
@@ -96,6 +104,7 @@ public class PlayerController : MonoBehaviour {
 
 	void Start ()
 	{
+		soundManager = GameController.instance.soundManager;
 		strength = GameController.instance.playerStrength;
 		fear = GameController.instance.playerFear;
 		last_position = transform.position;
@@ -169,6 +178,21 @@ public class PlayerController : MonoBehaviour {
 		else if (is_moving && !is_up)
 		{
 
+		}
+
+		// if (is_moving)
+		// {
+		// 	soundManager.RandomizeEffect (footstep);
+		// }
+
+		CheckIfGameOver ();
+
+		if (questManager != null && questManager.quests.Count > 0)
+		{
+			foreach (Quest quest in questManager.quests)
+			{
+				questManager.CheckForComplete (quest.id, this);
+			}
 		}
 	}
 
@@ -358,20 +382,33 @@ public class PlayerController : MonoBehaviour {
 
 	void UpdateStatus ()
 	{
+		if (fear > mid_fear && shadows.Count > 0)
+		{
+			soundManager.PlayPanic ();
+		}
+		else
+		{
+			soundManager.StopPanic ();
+		}
+
 		// Debug.Log (monsters.Count + ", " + shadows.Count + ", " + strength + ", " + fear);
 		if (is_moving)
 		{
 			if (monsters.Count > 0 && fear > high_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count * monsters.Count + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count * 4 + 1) * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > mid_fear)
 			{
-				LossStrength (strengthLoss * (monsters.Count + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count * 4 + 1) * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > low_fear)
 			{
-				LossStrength (strengthLoss * (Mathf.Log (monsters.Count) + 1) * Time.deltaTime);
+				LossStrength (strengthLoss * (monsters.Count * 3 + 1) * Time.deltaTime);
+			}
+			else if (monsters.Count > 0)
+			{
+				LossStrength (strengthLoss * (monsters.Count * 2 + 1) * Time.deltaTime);
 			}
 			else
 			{
@@ -382,15 +419,19 @@ public class PlayerController : MonoBehaviour {
 		{
 			if (monsters.Count > 0 && fear > high_fear)
 			{
-				LossStrength (strengthLoss * monsters.Count * monsters.Count * Time.deltaTime);
+				LossStrength (strengthLoss * monsters.Count * 4 * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > mid_fear)
 			{
-				LossStrength (strengthLoss * monsters.Count * Time.deltaTime);
+				LossStrength (strengthLoss * monsters.Count * 4 * Time.deltaTime);
 			}
 			else if (monsters.Count > 0 && fear > low_fear)
 			{
-				LossStrength (strengthLoss * Mathf.Log (monsters.Count) * Time.deltaTime);
+				LossStrength (strengthLoss * monsters.Count * 3 * Time.deltaTime);
+			}
+			else if (monsters.Count > 0)
+			{
+				LossStrength (strengthLoss * monsters.Count * 2 * Time.deltaTime);
 			}
 		}
 
@@ -447,7 +488,7 @@ public class PlayerController : MonoBehaviour {
 		strength -= loss;
 		if (strength <= min_strength)
 		{
-			GameController.instance.GameOver ();
+			strength = min_strength;
 		}
 		// CheckIfGameOver ();
 
@@ -493,11 +534,13 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (other.gameObject.CompareTag ("Strength"))
 		{
+			soundManager.RandomizeEffect (pickUpStrength);
 			GainStrength (strengthGain);
 			Destroy (other.gameObject);
 		}
 		if (other.gameObject.CompareTag ("Courage"))
 		{
+			soundManager.RandomizeEffect (pickUpCourage);
 			GainCourage (courageGain);
 			Destroy (other.gameObject);
 		}
@@ -511,11 +554,11 @@ public class PlayerController : MonoBehaviour {
 		}
 		if (other.gameObject.CompareTag ("WisdomTree"))
 		{
-			//
+			soundManager.RandomizeEffect (meetWisdom);
 		}
 		if (other.gameObject.CompareTag ("SpiritTree"))
 		{
-			//
+			soundManager.RandomizeEffect (meetSpirit);
 		}
 
 		if (questManager != null && questManager.quests.Count > 0)
@@ -542,7 +585,6 @@ public class PlayerController : MonoBehaviour {
 					// 	completes.Add (completeObject);
 					// }
 				}
-				questManager.CheckForComplete (quest.id, this);
 			}
 		}
 	}

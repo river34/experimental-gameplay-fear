@@ -22,6 +22,8 @@ public class Quest
 	public bool wisdomTree;
 	public bool spiritTree;
 	public bool monster;
+	public int level;
+	public AudioClip voiceOver;
 
 	public bool isFinished;
 	public float startTime;
@@ -29,7 +31,9 @@ public class Quest
 	public List<GameObject> objects;
 
 	public Quest (int _id, string _name, string _text, string _tag, int _num, bool _isOpen, string[] _next,
-		float _minStrength, float _maxStrength, float _minFear, float _maxFear, bool _strengthStar, bool _courageStar, bool _wisdomTree, bool _spiritTree, bool _monster)
+		float _minStrength, float _maxStrength, float _minFear, float _maxFear,
+		bool _strengthStar, bool _courageStar, bool _wisdomTree, bool _spiritTree, bool _monster,
+		int _level, AudioClip _voiceOver)
 	{
 		id = _id;
 		name = _name;
@@ -47,7 +51,37 @@ public class Quest
 		wisdomTree = _wisdomTree;
 		spiritTree = _spiritTree;
 		monster = _monster;
+		level = _level;
+		voiceOver = _voiceOver;
 
+		isFinished = false;
+		startTime = Time.deltaTime;
+		objects = new List<GameObject> ();
+	}
+
+	public Quest (int _id, string _name, string _text, string _tag, int _num, bool _isOpen, string[] _next,
+		float _minStrength, float _maxStrength, float _minFear, float _maxFear,
+		bool _strengthStar, bool _courageStar, bool _wisdomTree, bool _spiritTree, bool _monster, int _level)
+	{
+		id = _id;
+		name = _name;
+		text = _text;
+		tag = _tag;
+		num = _num;
+		isOpen = _isOpen;
+		next = _next;
+		minStrength = _minStrength;
+		maxStrength = _maxStrength;
+		minFear = _minFear;
+		maxFear = _maxFear;
+		strengthStar = _strengthStar;
+		courageStar = _courageStar;
+		wisdomTree = _wisdomTree;
+		spiritTree = _spiritTree;
+		monster = _monster;
+		level = _level;
+
+		voiceOver = null;
 		isFinished = false;
 		startTime = Time.deltaTime;
 		objects = new List<GameObject> ();
@@ -56,31 +90,44 @@ public class Quest
 
 public class QuestManager : MonoBehaviour {
 
-	public static QuestManager instance = null;
-
 	public List<Quest> quests;
 
+	// UI
 	public GameObject UI_Quest;
-
 	private Text questName;
 	private Text questText;
+
+	// current quest
 	private Quest quest;
+
+	// map generator
 	private MapGenerator map;
+
+	// sound manager
+	private SoundManager soundManager;
+	public AudioClip VO_Strength;
+	public AudioClip VO_MoreStrength;
+	public AudioClip VO_WisdomTree;
+	public AudioClip VO_Courage;
+	public AudioClip VO_MoreCourage;
+	public AudioClip VO_Ghost;
+	public AudioClip VO_StrengthDrop;
+	public AudioClip VO_CannotSee;
+	public AudioClip VO_MoreGhosts;
+	public AudioClip VO_Everywhere;
+	public AudioClip VO_Solution;
+	public AudioClip VO_Disappear;
+	public AudioClip VO_Closer;
+	public AudioClip VO_Ask;
+	public AudioClip VO_Reflection;
+	public AudioClip VO_Spirit;
 
 	void Awake ()
 	{
+		soundManager = gameObject.GetComponent<SoundManager> ();
 		map = gameObject.GetComponent<MapGenerator> ();
 		questName = UI_Quest.transform.Find ("Name").gameObject.GetComponent<Text>();
 		questText = UI_Quest.transform.Find ("Text").gameObject.GetComponent<Text>();
-
-		if (instance == null)
-		{
-			instance = this;
-		}
-		else if (instance != this)
-		{
-			Destroy (gameObject);
-		}
 
 		quests = new List<Quest> ();
 
@@ -101,7 +148,8 @@ public class QuestManager : MonoBehaviour {
 		"Ima needs physical strength to explore the forest.\r\nYellow Stars replenish Ima's strength.",
 		"Strength", 1, true, nextName,
 		-1, -1, -1, -1,
-		true, false, false, false, false);
+		true, false, false, false, false,
+		1, VO_Strength);
 		quests.Add (quest);
 
 		// quest : more strength
@@ -111,8 +159,9 @@ public class QuestManager : MonoBehaviour {
 		quest = new Quest (quests.Count, thisName,
 		"The stronger Ima is, the brighter she will appear. \r\nShift / Space / Right Click to move faster.",
 		"Strength", 1, false, nextName,
-		1000, 1000, -1, -1,
-		true, false, false, false, false);
+		950, 1000, -1, -1,
+		true, false, false, false, false,
+		1, VO_MoreStrength);
 		quests.Add (quest);
 
 		// quest : find the wisdom tree
@@ -123,7 +172,8 @@ public class QuestManager : MonoBehaviour {
 		"However, physical strength is not the only thing Ima needs. \r\nA Kumu can always ask the Wisdom Tree for advice.",
 		"WisdomTree", 1, false, nextName,
 		-1, -1, -1, -1,
-		true, false, true, false, false);
+		true, false, true, false, false,
+		2, VO_WisdomTree);
 		quests.Add (quest);
 
 		// quest : collect red star
@@ -131,10 +181,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "More Courage";
 		quest = new Quest (quests.Count, thisName,
-		"Wisdom Tree: One needs courage to survive the Fear Forest. \r\nRed Stars give you courage.",
+		"Wisdom Tree: One needs courage to survive the Fear Forest. \r\nRed Stars provide courage.",
 		"Courage", 1, false, nextName,
 		-1, -1, -1, -1,
-		true, true, false, false, false);
+		true, true, false, false, false,
+		3, VO_Courage);
 		quests.Add (quest);
 
 		// quest : courage
@@ -144,10 +195,11 @@ public class QuestManager : MonoBehaviour {
 		nextName[1] = "Ghosts 2";
 		nextName[2] = "Ghosts 3";
 		quest = new Quest (quests.Count, thisName,
-		"Courage lets Ima see things clearly. \r\nThat's exactly what Ima needs in this darkness.",
+		"Courage allows Ima to see clearly. \r\nThat is exactly what Ima needs in this darkness.",
 		"Courage", 1, false, nextName,
 		-1, -1, 0, 800,
-		true, false, false, false, false);
+		true, true, false, false, false,
+		3, VO_MoreCourage);
 		quests.Add (quest);
 
 		// quest : ghosts 1
@@ -155,10 +207,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "Strength Drop";
 		quest = new Quest (quests.Count, thisName,
-		"Wisdom Tree:  In the Fear Forest there live Ghosts.\r\nGhosts will take away Ima's physical strength.",
-		"Monster", 3, false, nextName,
-		0, 500, -1, -1,
-		true, false, false, false, true);
+		"Wisdom Tree:  Ghosts wonder in the Fear Forest.\r\nThey will take away Ima's physical strength.",
+		"Monster", 1, false, nextName,
+		501, 800, -1, -1,
+		true, false, false, false, true,
+		4, VO_Ghost);
 		quests.Add (quest);
 
 		// quest : ghosts 2
@@ -166,10 +219,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "Cannot See";
 		quest = new Quest (quests.Count, thisName,
-		"Wisdom Tree:  In the Fear Forest there live Ghosts.\r\nGhosts will take away Ima's physical strength.",
-		"Monster", 3, false, nextName,
-		-1, -1, 900, 1000,
-		true, false, false, false, true);
+		"Wisdom Tree:  Ghosts wonder in the Fear Forest.\r\nThey will take away Ima's physical strength.",
+		"Monster", 1, false, nextName,
+		-1, -1, 901, 1000,
+		true, false, false, false, true,
+		4, VO_Ghost);
 		quests.Add (quest);
 
 		// quest : ghosts 3
@@ -177,10 +231,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "More Ghosts";
 		quest = new Quest (quests.Count, thisName,
-		"Wisdom Tree:  In the Fear Forest there live Ghosts.\r\nGhosts will take away Ima's physical strength.",
+		"Wisdom Tree:  Ghosts wonder in the Fear Forest.\r\nThey will take away Ima's physical strength.",
 		"Monster", 5, false, nextName,
-		-1, -1, -1, -1,
-		true, false, false, false, true);
+		801, 1000, -1, -1,
+		true, false, false, false, true,
+		4, VO_Ghost);
 		quests.Add (quest);
 
 		// quest : Strength Drop
@@ -188,10 +243,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "More Ghosts";
 		quest = new Quest (quests.Count, thisName,
-		"Fear is consuming poor Ima.  Ima's strength is dropping.",
-		"Monster", 5, false, nextName,
-		-1, -1, -1, -1,
-		true, false, false, false, true);
+		"Ima is being consumed by Fear.  Ima's strength is dropping.",
+		"Monster", 1, false, nextName,
+		801, 1000, -1, -1,
+		true, false, false, false, true,
+		4, VO_StrengthDrop);
 		quests.Add (quest);
 
 		// quest : Cannot See
@@ -199,23 +255,24 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "More Ghosts";
 		quest = new Quest (quests.Count, thisName,
-		"Ima lost all courage and therefore cannot see anything.",
+		"Ima lost all courage. Ima can no longer see.",
 		"Monster", 5, false, nextName,
-		-1, -1, -1, -1,
-		true, false, false, false, true);
+		801, 1000, -1, -1,
+		true, false, false, false, true,
+		4, VO_CannotSee);
 		quests.Add (quest);
 
 		// quest : More Ghosts
 		thisName = "More Ghosts";
-		nextName = new string[3];
+		nextName = new string[2];
 		nextName[0] = "Everywhere 1";
 		nextName[1] = "Everywhere 2";
-		nextName[2] = "Everywhere 3";
 		quest = new Quest (quests.Count, thisName,
-		"More of them are coming...",
-		"Monster", 8, false, nextName,
-		-1, -1, -1, -1,
-		true, false, false, false, true);
+		"More Ghosts are coming...",
+		"Monster", 5, false, nextName,
+		801, 1000, -1, -1,
+		true, false, false, false, true,
+		5, VO_MoreGhosts);
 		quests.Add (quest);
 
 		// quest : Everywhere 1
@@ -224,10 +281,11 @@ public class QuestManager : MonoBehaviour {
 		nextName[0] = "Solution 1";
 		nextName[1] = "Solution 2";
 		quest = new Quest (quests.Count, thisName,
-		"Ghosts are everywhere.  There is no way to get rid of them...",
+		"Ghosts are everywhere.  What will Ima do?",
 		"Monster", 5, false, nextName,
-		0, 600, -1, -1,
-		true, false, false, false, true);
+		801, 1000, 801, 1000,
+		true, false, false, false, true,
+		6, VO_Everywhere);
 		quests.Add (quest);
 
 		// quest : Everywhere 2
@@ -235,22 +293,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "Disappear";
 		quest = new Quest (quests.Count, thisName,
-		"Ghosts are everywhere.  There is no way to get rid of them...",
+		"Ghosts are everywhere.  What will Ima do?",
 		"Monster", 5, false, nextName,
-		-1, -1, 0, 700,
-		true, false, false, false, true);
-		quests.Add (quest);
-
-		// quest : Everywhere 3
-		thisName = "Everywhere 3";
-		nextName = new string[2];
-		nextName[0] = "Solution 1";
-		nextName[1] = "Solution 2";
-		quest = new Quest (quests.Count, thisName,
-		"Ghosts are everywhere.  There is no way to get rid of them...",
-		"Monster", 8, false, nextName,
-		-1, -1, -1, -1,
-		true, false, false, false, true);
+		801, 1000, 301, 600,
+		true, false, false, false, true,
+		6, VO_Everywhere);
 		quests.Add (quest);
 
 		// quest : Solution 1
@@ -259,9 +306,10 @@ public class QuestManager : MonoBehaviour {
 		nextName[0] = "Disappear";
 		quest = new Quest (quests.Count, thisName,
 		"There must be a way to deal with them.",
-		"Monster", 5, false, nextName,
-		-1, -1, 0, 600,
-		true, false, false, false, true);
+		"Monster", 1, false, nextName,
+		801, 1000, 301, 600,
+		true, false, false, false, true,
+		6, VO_Solution);
 		quests.Add (quest);
 
 		// quest : Solution 2
@@ -270,9 +318,22 @@ public class QuestManager : MonoBehaviour {
 		nextName[0] = "Closer";
 		quest = new Quest (quests.Count, thisName,
 		"There must be a way to deal with them.",
-		"Monster", 8, false, nextName,
-		-1, -1, -1, -1,
-		true, false, false, false, true);
+		"Monster", 5, false, nextName,
+		601, 800, 801, 1000,
+		true, false, false, false, true,
+		6, VO_Solution);
+		quests.Add (quest);
+
+		// quest : Closer
+		thisName = "Closer";
+		nextName = new string[1];
+		nextName[0] = "Disappear";
+		quest = new Quest (quests.Count, thisName,
+		"What happens if Ima approaches the Ghosts?",
+		"Monster", 1, false, nextName,
+		801, 1000, 301, 600,
+		true, false, false, false, true,
+		6, VO_Closer);
 		quests.Add (quest);
 
 		// quest : Disappear
@@ -281,20 +342,10 @@ public class QuestManager : MonoBehaviour {
 		nextName[0] = "Ask";
 		quest = new Quest (quests.Count, thisName,
 		"Is that true? Some Ghosts are fading.",
-		"Monster", 5, false, nextName,
-		800, 1000, 0, 200,
-		true, false, false, false, true);
-		quests.Add (quest);
-
-		// quest : Closer
-		thisName = "Closer";
-		nextName = new string[1];
-		nextName[0] = "Ask";
-		quest = new Quest (quests.Count, thisName,
-		"What happens if Ima approaches the Ghosts?",
-		"Monster", 5, false, nextName,
-		800, 1000, 0, 200,
-		true, false, false, false, true);
+		"Monster", 1, false, nextName,
+		801, 1000, 0, 300,
+		true, false, false, false, true,
+		7, VO_Disappear);
 		quests.Add (quest);
 
 		// quest : secret
@@ -302,10 +353,11 @@ public class QuestManager : MonoBehaviour {
 		nextName = new string[1];
 		nextName[0] = "Reflection";
 		quest = new Quest (quests.Count, thisName,
-		"That is weird.  Maybe Wisdom Tree knows the answer.",
+		"That is unusual.  Maybe Wisdom Tree knows the answer.",
 		"WisdomTree", 1, false, nextName,
 		-1, -1, -1, -1,
-		true, false, true, false, true);
+		true, false, true, false, true,
+		8, VO_Ask);
 		quests.Add (quest);
 
 		// quest : Reflection
@@ -314,9 +366,10 @@ public class QuestManager : MonoBehaviour {
 		nextName[0] = "Spirit";
 		quest = new Quest (quests.Count, thisName,
 		"Wisdom Tree:  A true Kumu shall not be afraid of Ghosts. \r\nThey are nothing more than a reflection of your own fear.",
-		"Monster", 5, false, nextName,
-		900, 1000, 0, 100,
-		true, false, false, false, true);
+		"Monster", 1, false, nextName,
+		801, 1000, 0, 100,
+		true, false, false, false, true,
+		9, VO_Reflection);
 		quests.Add (quest);
 
 		// quest : spirit
@@ -326,7 +379,8 @@ public class QuestManager : MonoBehaviour {
 		"Wisdom Tree:  Now go find the Sacred Tree, and spirits will guide you further on.",
 		"SpiritTree", 1, false, nextName,
 		-1, -1, -1, -1,
-		true, false, false, true, false);
+		true, false, false, true, false,
+		10, VO_Spirit);
 		quests.Add (quest);
 
 		if (quests == null || quests.Count <= 0)
@@ -334,6 +388,11 @@ public class QuestManager : MonoBehaviour {
 			return;
 		}
 
+		enabled = false;
+	}
+
+	void OnEnable ()
+	{
 		foreach (Quest quest in quests)
 		{
 			if (quest.isOpen && !quest.isFinished)
@@ -349,7 +408,7 @@ public class QuestManager : MonoBehaviour {
 		}
 	}
 
-	public void CompleteQuest (string completeName, int completeLevel)
+	public void CompleteQuest (string completeName)
 	{
 		// Debug.Log ("Force Complete " + completeName);
 		Quest completeQuest = FindByName (completeName);
@@ -361,7 +420,7 @@ public class QuestManager : MonoBehaviour {
 
 		quests[id].isFinished = true;
 		quests[id].finishTime = Time.deltaTime;
-		GameController.instance.level += completeLevel;
+		GameController.instance.level = quests[id].level;
 
 		foreach (Quest quest in quests)
 		{
@@ -408,7 +467,7 @@ public class QuestManager : MonoBehaviour {
 		// Debug.Log ("Complete " + quests[id].name);
 		quests[id].isFinished = true;
 		quests[id].finishTime = Time.deltaTime;
-		GameController.instance.level += 1;
+		GameController.instance.level = quests[id].level;
 
 		foreach (Quest quest in quests)
 		{
@@ -459,6 +518,11 @@ public class QuestManager : MonoBehaviour {
 		if (quests[id].isFinished || !quests[id].isOpen)
 		{
 			return;
+		}
+
+		if (quests[id].voiceOver != null)
+		{
+			soundManager.PlayVoice (quests[id].voiceOver);
 		}
 
 		if (quests[id].strengthStar)

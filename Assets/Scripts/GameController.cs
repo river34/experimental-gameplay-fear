@@ -67,13 +67,17 @@ public class GameController : MonoBehaviour {
 	// sound
 	[HideInInspector]
 	public SoundManager soundManager;
+	public AudioClip MUS_intro;
+	public AudioClip MUS_game;
+	public AudioClip MUS_outro;
 
 	// state
 	// [HideInInspector]
 	public int state;
 
 	// color
-	private Color halfBlack = new Color (0, 0, 0, 0.7f);
+	private Color halfBlack = new Color (0, 0, 0, 0.5f);
+	private Color totalBlack = new Color (0, 0, 0, 0.85f);
 
 	// time control
 	private float time;
@@ -115,9 +119,10 @@ public class GameController : MonoBehaviour {
 				UI_Title.SetActive (true);
 			}
 
-			if (Time.time - time > 0.5f && Input.anyKey)
+			if (Time.time - time > 1f && Input.anyKey)
 			{
 				StartIntro ();
+				soundManager.PlayBackground (MUS_intro);
 				time = Time.time;
 				state = States.INTRO;
 			}
@@ -129,10 +134,11 @@ public class GameController : MonoBehaviour {
 				UI_Title.GetComponent <Image> ().color -= new Color (0, 0, 0, Time.deltaTime);
 			}
 
-			if (Time.time - time > 0.5f && Input.GetKey ("p"))
+			if (Time.time - time > 1f && Input.GetKey ("p"))
 			{
 				EndIntro ();
-				soundManager.PlayBackground ();
+				soundManager.PlayBackground (MUS_game);
+				soundManager.PlayAmbience ();
 				time = Time.time;
 				state = States.START;
 			}
@@ -148,7 +154,7 @@ public class GameController : MonoBehaviour {
 			UI_StrengthBar.sizeDelta = new Vector2 (playerStrength * num2bar, UI_StrengthBar.sizeDelta.y);
 			UI_CourageBar.sizeDelta = new Vector2 ((1000 - playerFear) * num2bar, UI_CourageBar.sizeDelta.y);
 			UI_CompleteBar.sizeDelta = new Vector2 (playerComplete * num2bar, UI_CompleteBar.sizeDelta.y);
-			UI_Mask.color = Color.Lerp (Color.clear, halfBlack, playerFear * reverseMul);
+			UI_Mask.color = Color.Lerp (halfBlack, totalBlack, playerFear * reverseMul);
 		}
 		else if (state == States.COMPLETE)
 		{
@@ -157,7 +163,7 @@ public class GameController : MonoBehaviour {
 			UI_End.transform.Find ("Text").GetComponent<Text>().text = completes [Random.Range (0, completes.Length)];
 			UI_End.transform.Find ("Restart").GetComponent<Text>().text = "Space to replay";
 
-			if (Time.time - time > 0.5f && Input.GetKey ("p"))
+			if (Time.time - time > 1 && Input.GetKey ("p"))
 			{
 				EndIntro ();
 				nextLevel ++;
@@ -193,6 +199,8 @@ public class GameController : MonoBehaviour {
 	{
 		if (state == States.INTRO)
 		{
+			soundManager.PlayBackground (MUS_game);
+			soundManager.PlayAmbience ();
 			time = Time.time;
 			state = States.START;
 		}
@@ -205,12 +213,14 @@ public class GameController : MonoBehaviour {
 
 	public void GameOver ()
 	{
+		soundManager.PlayBackground (MUS_outro);
 		time = Time.time;
 		state = States.FAIL;
 	}
 
 	public void GameComplete ()
 	{
+		soundManager.PlayBackground (MUS_outro);
 		time = Time.time;
 		state = States.COMPLETE;
 		StartComplete ();
@@ -223,7 +233,8 @@ public class GameController : MonoBehaviour {
 		playerObject = null;
 		mapObject = null;
 		UI_Game.SetActive (false);
-		soundManager.StopBackground ();
+		// soundManager.StopBackground ();
+		soundManager.StopAmbience ();
 		UI_Block.SetActive (false);
 		UI_End.SetActive (true);
 		cameraController.enabled = false;
@@ -244,7 +255,7 @@ public class GameController : MonoBehaviour {
 	void InitGame (string questName, int questLevel)
 	{
 		InitGame ();
-		questManager.CompleteQuest (questName, questLevel);
+		questManager.CompleteQuest (questName);
 	}
 
 	void InitGame ()
@@ -267,7 +278,7 @@ public class GameController : MonoBehaviour {
 		if (mapObject == null)
 			mapObject = new GameObject ("Map");
 
-		playerStrength = 500;
+		playerStrength = 300;
 		playerFear = 1000;
 		playerComplete = 0;
 

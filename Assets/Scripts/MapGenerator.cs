@@ -152,29 +152,29 @@ public class MapGenerator : MonoBehaviour {
 
 		if (!noWisdomTree)
 		{
-			LayoutObjectAtRandom (wisdomTreeTiles, 0, 1, offset_x, offset_y);
+			LayoutObjectAtRandom (wisdomTreeTiles, -1, 1, offset_x, offset_y);
 		}
 
 		if (!noSpiritTree)
 		{
-			LayoutObjectAtRandom (spiritTreeTiles, 0, 1, offset_x, offset_y);
+			LayoutObjectAtRandom (spiritTreeTiles, -2, 1, offset_x, offset_y);
 		}
 
 		if (!noStrength)
 		{
-			int strengthCount = Mathf.Max (15, 20 - (int) Mathf.Log (GameController.instance.level));
-			LayoutObjectAtRandom (strengthTiles, strengthCount - 5, strengthCount, offset_x, offset_y, "Strength");
+			int strengthCount = Mathf.Max (8, 15 - GameController.instance.level);
+			LayoutObjectAtRandom (strengthTiles, strengthCount - 3, strengthCount, offset_x, offset_y, "Strength");
 		}
 
 		if (!noCourage)
 		{
-			LayoutObjectAtRandom (courageTiles, 2, 2, offset_x, offset_y);
+			LayoutObjectAtRandom (courageTiles, 1, 1, offset_x, offset_y);
 		}
 
 		if (!noMonster)
 		{
 			// int monsterCount = (int) Mathf.Log (GameController.instance.level, 2f);
-			int monsterCount = GameController.instance.level;
+			int monsterCount = Mathf.Max (1, GameController.instance.level);
 			LayoutObjectAtRandom (monsterTiles, monsterCount, monsterCount, offset_x, offset_y, "Monster");
 		}
 

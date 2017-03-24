@@ -10,9 +10,9 @@
 
 ### Credits
 
-  - Engineer: River Liu
-  - Artist: River Liu
-  - Playtesters: Xuesong Liang, Emre Findik, Sunil Nayak, Colin Andrew Grant
+  - Engineer / Artist / Designer: River Liu
+  - Sound Designers: CA9 Studios
+  - Playtesters: Xuesong Liang, Emre Findik, Sunil Nayak, Colin Andrew Grant, Abhishek Ambre
 
 
 ### Special thanks
