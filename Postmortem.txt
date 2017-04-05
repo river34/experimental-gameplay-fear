@@ -1,0 +1,34 @@
+Theme:
+
+The theme for this week is Fear. I thought about jump-scares, escaping, danger, reactions related to fear...
+And finally I decided to make a 3D sandbox horror game! (where did that idea come from? Don't starve.)
+But I did not want to create a game just to invoke fear.
+I wanted to tackle the theme with a different approach - implementing the balance of fear and courage into gameplay.
+
+
+A few notes:
+
+During the real development phase, the sandbox idea did not work out due to limited time (2 days) and resources (bad art skills).
+I already had the map generating functions ready, but I didn't have enough time to make all the environment assets, or a nice interaction system.
+I still wanted it to be an open world, and I still wanted players to explore it, even if it was not a sandbox game - next time I will make a real sandbox!
+After I created the main mechanism and reduces interactions to the minimum, I realized that the game was not fun.
+So I decided to introduce a quest system, add a nice little story, and turn the game into a RPG!
+Game balance was another thing I spent a lot of time to work on. I created a nice chart to calculate it.
+After a few playtests, I found that different players had different understandings. If they didn't know the story already, they would have a hard time to figure out the gameplay.
+So I decided to change the linear approach to a multi-branching one, to give naive guests more hints, and experienced players more freedom.
+Another big problem was WebGL optimization. It did not really ring a bell to me before, because my last three WebGL games were all in 2D.
+Apparently WebGl could not handle 3D physics very well, so I changed all the 3D physics into 2D physics. Also I created a pool for recycling game object.
+Debugging in WebGl directly was impossible. To do that I had to make guesses and go through a try and fail cycle. I spent way more time than I should.
+
+
+What went right:
+
+1. The multi-branching quest system was something I felt really proud of. It was a quick and cheap fix but it worked.
+After the second iteration, player could complete any opened quests and moved to the next possible ones. I might reuse the system for some future games.
+2. Navigation system helps player to locate interesting objects.
+
+What went wrong:
+
+1. Player got stuck / did not understand the gameplay - introduced a quest system to guide players.
+2. Browser freezing - Unity's WebGl build striped certain "unused" assets and shaders, which caused serious problems later when I attempted to access them at runtime.
+3. Browser lagging - WebGL optimization.

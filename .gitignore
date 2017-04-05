@@ -5,8 +5,8 @@
 Library/
 Temp/
 ProjectSettings/
-*.meta
 Assembly-CSharp.csproj
+03_Fear.sln
 
 ## Build
 Build/

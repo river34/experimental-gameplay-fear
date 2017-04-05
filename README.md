@@ -36,7 +36,3 @@
 
   - Vintage Avalanche
   - Bakery
-
-
-### Sound effect
-  - [Wind Sound](http://soundbible.com/1810-Wind.html)
